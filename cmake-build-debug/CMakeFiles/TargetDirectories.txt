@@ -1,0 +1,3 @@
+/home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/CMakeFiles/gtk_project.dir
+/home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/CMakeFiles/rebuild_cache.dir

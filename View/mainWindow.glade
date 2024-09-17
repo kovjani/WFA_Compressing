@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.40.0 -->
+<interface>
+  <requires lib="gtk+" version="3.24"/>
+  <object class="GtkFileFilter" id="ImageFiles">
+    <mime-types>
+      <mime-type>image/png</mime-type>
+      <mime-type>image/jpeg</mime-type>
+      <mime-type>image/gif</mime-type>
+    </mime-types>
+  </object>
+  <object class="GtkApplicationWindow" id="window">
+    <property name="width-request">500</property>
+    <property name="can-focus">False</property>
+    <property name="border-width">25</property>
+    <property name="title" translatable="yes">WFA Tömörítés</property>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="margin-start">10</property>
+        <property name="margin-end">10</property>
+        <property name="margin-top">10</property>
+        <property name="margin-bottom">10</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">10</property>
+        <child>
+          <object class="GtkFileChooserButton" id="fileChooserButton">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="filter">ImageFiles</property>
+            <property name="title" translatable="yes"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="compressButton">
+            <property name="label" translatable="yes">Tömörítés</property>
+            <property name="visible">True</property>
+            <property name="sensitive">False</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+            <property name="halign">center</property>
+            <property name="margin-top">20</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

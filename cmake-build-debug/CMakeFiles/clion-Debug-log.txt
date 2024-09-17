@@ -1,0 +1,13 @@
+/home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/home/jani/Jetbrains/CLion/clion-2024.1.4/bin/ninja/linux/x64/ninja -G Ninja -S /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing -B /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug
+-- The CXX compiler identification is GNU 12.2.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found PkgConfig: /usr/bin/pkg-config (found version "1.8.1") 
+-- Checking for module 'gtk+-3.0'
+--   Found gtk+-3.0, version 3.24.38
+-- Configuring done (0.7s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug
