@@ -1,14 +1,21 @@
 cmake_minimum_required(VERSION 3.10)
-project(gtk_project)
+project(WFA)
 
 set(CMAKE_C_STANDARD 11)
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+find_package(GSL REQUIRED)
+find_package(BLAS REQUIRED)
+pkg_check_modules(GTK REQUIRED gtk+-3.0)
 
-include_directories(${GTK3_INCLUDE_DIRS})
-link_directories(${GTK3_LIBRARY_DIRS})
-add_definitions(${GTK3_CFLAGS_OTHER})
+include_directories(${GTK_INCLUDE_DIRS})
+link_directories(${GTK_LIBRARY_DIRS})
 
-add_executable(gtk_project main.c)
-target_link_libraries(gtk_project ${GTK3_LIBRARIES})
+add_executable(WFA main.c
+        header_files/rgbquadtree.h
+        header_files/wfa.h
+        source_files/rgbquadtree.c
+        source_files/wfa.c
+        header_files/quadrant.h)
+
+target_link_libraries(WFA ${GTK_LIBRARIES} GSL::gsl GSL::gslcblas m)

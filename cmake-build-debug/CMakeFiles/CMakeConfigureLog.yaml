@@ -527,3 +527,96 @@ events:
       
       
 ...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckFunctionExists.cmake:86 (try_compile)"
+      - "/home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindBLAS.cmake:372 (check_function_exists)"
+      - "/home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindBLAS.cmake:416 (check_blas_libraries)"
+      - "CMakeLists.txt:8 (find_package)"
+    checks:
+      - "Looking for sgemm_"
+    directories:
+      source: "/home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-SErIBV"
+      binary: "/home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-SErIBV"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "BLAS_WORKS"
+      cached: true
+      stdout: |
+        Change Dir: '/home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-SErIBV'
+        
+        Run Build Command(s): /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/ninja/linux/x64/ninja -v cmTC_ddef3
+        [1/2] /usr/bin/cc   -DCHECK_FUNCTION_EXISTS=sgemm_ -std=gnu11 -fdiagnostics-color=always -o CMakeFiles/cmTC_ddef3.dir/CheckFunctionExists.c.o -c /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-SErIBV/CheckFunctionExists.c
+        [2/2] : && /usr/bin/cc -DCHECK_FUNCTION_EXISTS=sgemm_  CMakeFiles/cmTC_ddef3.dir/CheckFunctionExists.c.o -o cmTC_ddef3   && :
+        FAILED: cmTC_ddef3 
+        : && /usr/bin/cc -DCHECK_FUNCTION_EXISTS=sgemm_  CMakeFiles/cmTC_ddef3.dir/CheckFunctionExists.c.o -o cmTC_ddef3   && :
+        /usr/bin/ld: CMakeFiles/cmTC_ddef3.dir/CheckFunctionExists.c.o: in function `main':
+        CheckFunctionExists.c:(.text+0x10): undefined reference to `sgemm_'
+        collect2: error: ld returned 1 exit status
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckCSourceCompiles.cmake:52 (cmake_check_source_compiles)"
+      - "/home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindThreads.cmake:97 (CHECK_C_SOURCE_COMPILES)"
+      - "/home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindThreads.cmake:163 (_threads_check_libc)"
+      - "/home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindBLAS.cmake:470 (find_package)"
+      - "CMakeLists.txt:8 (find_package)"
+    checks:
+      - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
+    directories:
+      source: "/home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-CkQSQF"
+      binary: "/home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-CkQSQF"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "CMAKE_HAVE_LIBC_PTHREAD"
+      cached: true
+      stdout: |
+        Change Dir: '/home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-CkQSQF'
+        
+        Run Build Command(s): /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/ninja/linux/x64/ninja -v cmTC_ef7d7
+        [1/2] /usr/bin/cc -DCMAKE_HAVE_LIBC_PTHREAD  -std=gnu11 -fdiagnostics-color=always -o CMakeFiles/cmTC_ef7d7.dir/src.c.o -c /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-CkQSQF/src.c
+        [2/2] : && /usr/bin/cc   CMakeFiles/cmTC_ef7d7.dir/src.c.o -o cmTC_ef7d7   && :
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckFunctionExists.cmake:86 (try_compile)"
+      - "/home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindBLAS.cmake:372 (check_function_exists)"
+      - "/home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindBLAS.cmake:1318 (check_blas_libraries)"
+      - "CMakeLists.txt:8 (find_package)"
+    checks:
+      - "Looking for sgemm_"
+    directories:
+      source: "/home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-bOo3NQ"
+      binary: "/home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-bOo3NQ"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "BLAS_blas_WORKS"
+      cached: true
+      stdout: |
+        Change Dir: '/home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-bOo3NQ'
+        
+        Run Build Command(s): /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/ninja/linux/x64/ninja -v cmTC_6fbd7
+        [1/2] /usr/bin/cc   -DCHECK_FUNCTION_EXISTS=sgemm_ -std=gnu11 -fdiagnostics-color=always -o CMakeFiles/cmTC_6fbd7.dir/CheckFunctionExists.c.o -c /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-bOo3NQ/CheckFunctionExists.c
+        [2/2] : && /usr/bin/cc -DCHECK_FUNCTION_EXISTS=sgemm_  CMakeFiles/cmTC_6fbd7.dir/CheckFunctionExists.c.o -o cmTC_6fbd7  /usr/lib/x86_64-linux-gnu/libblas.so && :
+        
+      exitCode: 0
+...

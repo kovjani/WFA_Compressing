@@ -11,7 +11,7 @@
 # =============================================================================
 
 # =============================================================================
-# Project: gtk_project
+# Project: WFA
 # Configurations: Debug
 # =============================================================================
 
@@ -41,37 +41,51 @@ include CMakeFiles/rules.ninja
 
 cmake_ninja_workdir = /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/
 # =============================================================================
-# Object build statements for EXECUTABLE target gtk_project
+# Object build statements for EXECUTABLE target WFA
 
 
 #############################################
-# Order-only phony target for gtk_project
+# Order-only phony target for WFA
 
-build cmake_object_order_depends_target_gtk_project: phony || CMakeFiles/gtk_project.dir
+build cmake_object_order_depends_target_WFA: phony || CMakeFiles/WFA.dir
 
-build CMakeFiles/gtk_project.dir/main.c.o: C_COMPILER__gtk_project_unscanned_Debug /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/main.c || cmake_object_order_depends_target_gtk_project
-  DEP_FILE = CMakeFiles/gtk_project.dir/main.c.o.d
-  FLAGS = -g -std=gnu11 -fdiagnostics-color=always   -pthread
+build CMakeFiles/WFA.dir/main.c.o: C_COMPILER__WFA_unscanned_Debug /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/main.c || cmake_object_order_depends_target_WFA
+  DEP_FILE = CMakeFiles/WFA.dir/main.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always
   INCLUDES = -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/fribidi -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gio-unix-2.0 -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include
-  OBJECT_DIR = CMakeFiles/gtk_project.dir
-  OBJECT_FILE_DIR = CMakeFiles/gtk_project.dir
+  OBJECT_DIR = CMakeFiles/WFA.dir
+  OBJECT_FILE_DIR = CMakeFiles/WFA.dir
+
+build CMakeFiles/WFA.dir/source_files/rgbquadtree.c.o: C_COMPILER__WFA_unscanned_Debug /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/source_files/rgbquadtree.c || cmake_object_order_depends_target_WFA
+  DEP_FILE = CMakeFiles/WFA.dir/source_files/rgbquadtree.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always
+  INCLUDES = -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/fribidi -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gio-unix-2.0 -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include
+  OBJECT_DIR = CMakeFiles/WFA.dir
+  OBJECT_FILE_DIR = CMakeFiles/WFA.dir/source_files
+
+build CMakeFiles/WFA.dir/source_files/wfa.c.o: C_COMPILER__WFA_unscanned_Debug /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/source_files/wfa.c || cmake_object_order_depends_target_WFA
+  DEP_FILE = CMakeFiles/WFA.dir/source_files/wfa.c.o.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always
+  INCLUDES = -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/fribidi -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gio-unix-2.0 -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include
+  OBJECT_DIR = CMakeFiles/WFA.dir
+  OBJECT_FILE_DIR = CMakeFiles/WFA.dir/source_files
 
 
 # =============================================================================
-# Link build statements for EXECUTABLE target gtk_project
+# Link build statements for EXECUTABLE target WFA
 
 
 #############################################
-# Link the executable gtk_project
+# Link the executable WFA
 
-build gtk_project: C_EXECUTABLE_LINKER__gtk_project_Debug CMakeFiles/gtk_project.dir/main.c.o
+build WFA: C_EXECUTABLE_LINKER__WFA_Debug CMakeFiles/WFA.dir/main.c.o CMakeFiles/WFA.dir/source_files/rgbquadtree.c.o CMakeFiles/WFA.dir/source_files/wfa.c.o | /usr/lib/x86_64-linux-gnu/libgsl.so /usr/lib/x86_64-linux-gnu/libgslcblas.so
   FLAGS = -g
-  LINK_LIBRARIES = -lgtk-3  -lgdk-3  -lz  -lpangocairo-1.0  -lpango-1.0  -lharfbuzz  -latk-1.0  -lcairo-gobject  -lcairo  -lgdk_pixbuf-2.0  -lgio-2.0  -lgobject-2.0  -lglib-2.0
-  OBJECT_DIR = CMakeFiles/gtk_project.dir
+  LINK_LIBRARIES = -lgtk-3  -lgdk-3  -lz  -lpangocairo-1.0  -lpango-1.0  -lharfbuzz  -latk-1.0  -lcairo-gobject  -lcairo  -lgdk_pixbuf-2.0  -lgio-2.0  -lgobject-2.0  -lglib-2.0  /usr/lib/x86_64-linux-gnu/libgsl.so  /usr/lib/x86_64-linux-gnu/libgslcblas.so  -lm
+  OBJECT_DIR = CMakeFiles/WFA.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_FILE = gtk_project
-  TARGET_PDB = gtk_project.dbg
+  TARGET_FILE = WFA
+  TARGET_PDB = WFA.dbg
 
 
 #############################################
@@ -107,7 +121,7 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 #############################################
 # Folder: /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug
 
-build all: phony gtk_project
+build all: phony WFA
 
 # =============================================================================
 # Built-in targets
@@ -116,14 +130,14 @@ build all: phony gtk_project
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/CMakeLists.txt /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-C.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageMessage.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPkgConfig.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-C.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.28.1/CMakeCCompiler.cmake CMakeFiles/3.28.1/CMakeCXXCompiler.cmake CMakeFiles/3.28.1/CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE | /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/CMakeLists.txt /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckCSourceCompiles.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckFunctionExists.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckIncludeFile.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckLibraryExists.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-C.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindBLAS.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindGSL.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageMessage.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPkgConfig.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindThreads.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-C.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.28.1/CMakeCCompiler.cmake CMakeFiles/3.28.1/CMakeCXXCompiler.cmake CMakeFiles/3.28.1/CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/CMakeLists.txt /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-C.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageMessage.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPkgConfig.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-C.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.28.1/CMakeCCompiler.cmake CMakeFiles/3.28.1/CMakeCXXCompiler.cmake CMakeFiles/3.28.1/CMakeSystem.cmake: phony
+build /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/CMakeLists.txt /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckCSourceCompiles.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckFunctionExists.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckIncludeFile.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckLibraryExists.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-C.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindBLAS.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindGSL.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageMessage.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPkgConfig.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindThreads.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-C.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux.cmake /home/jani/Jetbrains/CLion/clion-2024.1.4/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.28.1/CMakeCCompiler.cmake CMakeFiles/3.28.1/CMakeCXXCompiler.cmake CMakeFiles/3.28.1/CMakeSystem.cmake: phony
 
 
 #############################################
