@@ -86,7 +86,7 @@
               <object class="GtkFileChooserButton" id="coding_file_chooser_button">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="filter">WFAFiles</property>
+                <property name="filter">ImageFiles</property>
                 <property name="title" translatable="yes"/>
               </object>
               <packing>

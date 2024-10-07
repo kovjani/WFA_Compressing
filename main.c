@@ -1,4 +1,5 @@
 #include "header_files/rgbquadtree.h"
+#include "header_files/grayquadtree.h"
 #include "header_files/wfa.h"
 
 #include <stdio.h>
@@ -29,7 +30,8 @@ void SwitchToDeCoding(GtkButton *button, GtkStack *stack) {
 }
 
 int main(int argc, char *argv[]) {
-
+    // Test1();
+    // Test2();
     gtk_init(&argc, &argv);
 
     // Load the Glade file.
@@ -62,7 +64,7 @@ int main(int argc, char *argv[]) {
     g_signal_connect(coding_file_chooser_button, "file-set", G_CALLBACK(CodingFileChoosed), coding_button);
     g_signal_connect(decoding_file_chooser_button, "file-set", G_CALLBACK(DecodingFileChoosed), decoding_button);
 
-//    g_signal_connect(coding_button, "clicked", G_CALLBACK(RGBWFACode), coding_file_chooser_button);
+    g_signal_connect(coding_button, "clicked", G_CALLBACK(WFACode), coding_file_chooser_button);
     g_signal_connect(decoding_button, "clicked", G_CALLBACK(GrayWFADecode), decoding_file_chooser_button);
 
     g_signal_connect(coding_page_button, "clicked", G_CALLBACK(SwitchToCoding), stack);
@@ -74,6 +76,8 @@ int main(int argc, char *argv[]) {
 
     gtk_widget_show_all(window);
     gtk_main();
+
+
 
     return 0;
 }
