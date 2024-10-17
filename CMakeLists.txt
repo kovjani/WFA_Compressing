@@ -11,13 +11,12 @@ pkg_check_modules(GTK REQUIRED gtk+-3.0)
 include_directories(${GTK_INCLUDE_DIRS})
 link_directories(${GTK_LIBRARY_DIRS})
 
-add_executable(WFA main.c
-        header_files/rgbquadtree.h
-        header_files/wfa.h
-        source_files/rgbquadtree.c
-        source_files/wfa.c
-        header_files/quadrant.h
-        source_files/grayquadtree.c
-        header_files/grayquadtree.h)
+add_executable(WFA main.cpp
+        source_files/Testing.cpp
+        header_files/Testing.h
+        source_files/Decoding.cpp
+        header_files/Decoding.h
+        source_files/Coding.cpp
+        header_files/Coding.h)
 
 target_link_libraries(WFA ${GTK_LIBRARIES} GSL::gsl GSL::gslcblas m)

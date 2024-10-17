@@ -1,22 +1,17 @@
-#include "header_files/rgbquadtree.h"
-#include "header_files/grayquadtree.h"
-#include "header_files/wfa.h"
-
-#include <stdio.h>
+#include <iostream>
+#include <string>
 #include <gtk/gtk.h>
 #include <math.h>
-#include <stdbool.h>
+#include "header_files/Coding.h"
+#include "header_files/Decoding.h"
+#include "header_files/Testing.h"
 
-void Close(GtkWidget *widget, gpointer data) {
-    gtk_window_close(widget);
-}
-
-void CodingFileChoosed(GtkFileChooserButton *clicked_button, gpointer coding_button) {
+void CodingFileChoosed(GtkFileChooserButton *clicked_button, GtkWidget *coding_button) {
     // Make compress button sensitive.
     gtk_widget_set_sensitive(coding_button, TRUE);
 }
 
-void DecodingFileChoosed(GtkFileChooserButton *clicked_button, gpointer decoding_button) {
+void DecodingFileChoosed(GtkFileChooserButton *clicked_button, GtkWidget *decoding_button) {
     // Make compress button sensitive.
     gtk_widget_set_sensitive(decoding_button, TRUE);
 }
@@ -29,9 +24,32 @@ void SwitchToDeCoding(GtkButton *button, GtkStack *stack) {
     gtk_stack_set_visible_child_name(stack, "decoding_page");
 }
 
+void onCodingClicked(GtkWidget *clicked_button, GtkWidget *file_chooser_button) {
+    char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_chooser_button));
+    char *directory = g_path_get_dirname(filename);
+
+    Coding code(filename);
+    code.Start();
+
+    g_free(filename);
+    g_free(directory);
+}
+
+void onDecodingClicked(GtkWidget *clicked_button, GtkWidget *file_chooser_button) {
+    char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_chooser_button));
+    char *directory = g_path_get_dirname(filename);
+
+    Decoding decode(filename, 9);
+    decode.Start(directory, "wfa_image");
+
+    g_free(filename);
+    g_free(directory);
+}
+
 int main(int argc, char *argv[]) {
-    // Test1();
-    // Test2();
+    /*Testing test(1,9);
+    test.Start();
+    */
     gtk_init(&argc, &argv);
 
     // Load the Glade file.
@@ -42,7 +60,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Get the main window pointer from the Glade file.
-    GtkBuilder *window = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
+    GtkWidget *window = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
     if (!window) {
         g_printerr("Error: could not find the 'window' object\n");
         return 1;
@@ -64,8 +82,8 @@ int main(int argc, char *argv[]) {
     g_signal_connect(coding_file_chooser_button, "file-set", G_CALLBACK(CodingFileChoosed), coding_button);
     g_signal_connect(decoding_file_chooser_button, "file-set", G_CALLBACK(DecodingFileChoosed), decoding_button);
 
-    g_signal_connect(coding_button, "clicked", G_CALLBACK(WFACode), coding_file_chooser_button);
-    g_signal_connect(decoding_button, "clicked", G_CALLBACK(GrayWFADecode), decoding_file_chooser_button);
+    g_signal_connect(coding_button, "clicked", G_CALLBACK(onCodingClicked), coding_file_chooser_button);
+    g_signal_connect(decoding_button, "clicked", G_CALLBACK(onDecodingClicked), decoding_file_chooser_button);
 
     g_signal_connect(coding_page_button, "clicked", G_CALLBACK(SwitchToCoding), stack);
     g_signal_connect(decoding_page_button, "clicked", G_CALLBACK(SwitchToDeCoding), stack);
@@ -76,8 +94,6 @@ int main(int argc, char *argv[]) {
 
     gtk_widget_show_all(window);
     gtk_main();
-
-
 
     return 0;
 }
