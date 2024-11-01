@@ -1,6 +1,6 @@
 #include "../header_files/Coding.h"
 
-Coding::Coding(char *filename) {
+Coding::Coding(const char *filename) {
     //Open the image and split it into pieces.
 
     // Open image
@@ -24,74 +24,393 @@ Coding::Coding(char *filename) {
     // A full quadtree for a (2^level*2^level) image has ((4^level - 1) / 3) nodes.
     // The number of leaves in a full quadtree is (4^level).
     // We don't want to store the leaves.
-    this->depth = (int)log2(this->coding_image_size); // maximum recursion level
-    this->quadtree_size = 0;
-    for (int i = 0; i < this->depth; ++i) {
-        this->quadtree_size += pow(4, i);
-    }
-    this->quadtree = (double *)malloc( this->quadtree_size * sizeof(double) );
+    this->depth = static_cast <int> (log2(this->coding_image_size)); // maximum recursion level
+    this->quadtree_size_1 = 0;
 
-    for (int i = 0; i < this->quadtree_size; i++) {
-        this->quadtree[i] = -1;
+    // In this iteration the maximum value of i is depth-1
+    // Save the size of depth-3, depth-2, depth-1 quadtrees
+    for (int i = 0; i < this->depth; ++i) {
+        this->quadtree_size_1 += pow(4, i);
+        if(i == this->depth - 3) {
+            this->quadtree_size_3 = this->quadtree_size_1;
+        } else if(i == this->depth - 2) {
+            this->quadtree_size_2 = this->quadtree_size_1;
+        }
     }
+
+    this->quadtree = new Quadrant*[this->quadtree_size_1];
+    // Initial basis
+    int initial_basis_size = 1;
+
+    this->F = gsl_matrix_alloc(initial_basis_size, 1);
+
+    this->A = gsl_matrix_alloc(initial_basis_size, initial_basis_size);
+    this->B = gsl_matrix_alloc(initial_basis_size, initial_basis_size);
+    this->C = gsl_matrix_alloc(initial_basis_size, initial_basis_size);
+    this->D = gsl_matrix_alloc(initial_basis_size, initial_basis_size);
+
+    gsl_matrix_set_zero(this->A);
+    gsl_matrix_set_zero(this->B);
+    gsl_matrix_set_zero(this->C);
+    gsl_matrix_set_zero(this->D);
+    gsl_matrix_set_zero(this->F);
 }
 
 Coding::~Coding() {
     // Free the allocated memory.
     g_object_unref(this->pixbuf);
-    g_free(this->quadtree);
+
+    for (int i = 0; i < this->quadtree_size_1; ++i) {
+        delete this->quadtree[i];
+        this->quadtree[i] = nullptr;
+    }
+
+    delete[] this->quadtree;
+    this->quadtree = nullptr;
+
+    // Save states_count into a local variable, because if a state is deleted, states_count is decremented by 1.
+    int states_number = State::states_count;
+
+    for (int i = 0; i < states_number; ++i) {
+        delete this->states[i];
+        this->states[i] = nullptr;
+    }
+
+    delete[] this->states;
+    this->states = nullptr;
+
+    gsl_matrix_free(this->A);
+    gsl_matrix_free(this->B);
+    gsl_matrix_free(this->C);
+    gsl_matrix_free(this->D);
+    gsl_matrix_free(this->F);
 }
 
 void Coding::Start() {
     CreateQuadtree(this->depth, 0, 0, 0);
+    ChildPointers();
 
-    for (int i = 0; i < this->quadtree_size; i++) {
-        g_print("%f ", this->quadtree[i]);
+    /*for (int i = 0; i < this->quadtree_size_1; i++) {
+        g_print("%f ", this->quadtree[i]->brightness);
+    }*/
+
+    CreateWFA(0.1);
+
+    SaveWFA("/home/jani/wfa.wfa");
+}
+
+void Coding::CreateWFA(double epsilon) {
+
+    // First state represents the whole image.
+    if(State::states_count == 0) {
+        this->states = new State*[1];
+        //Index is 0 by default
+        this->states[0] = new State(this->quadtree[0]);
+    }
+
+    for (int i = 0; i < State::states_count; ++i) {
+
+        State *scanned_state = this->states[i];
+
+        ScanState(scanned_state->a, 'a', i, epsilon);
+        ScanState(scanned_state->b, 'c', i, epsilon);
+        ScanState(scanned_state->c, 'b', i, epsilon);
+        ScanState(scanned_state->d, 'd', i, epsilon);
     }
 }
 
+void Coding::ScanState(Quadrant *quadrant, char quadrant_symbol, int state_index, double eps) {
+
+    // state image vs quadrant
+
+    State *state_image = this->states[state_index];
+
+    gsl_matrix *Acpy, *Bcpy, *Ccpy, *Dcpy, *Fcpy;
+    State **statescpy;
+    double cost_a, cost_b, cost_c, cost_d;
+
+    // Compare scanned quadrant's children and appropriate grandchildren of a parent.
+    // quadrant vs state_image
+    cost_a = quadrant->a->brightness / state_image->a->brightness;
+    cost_b = quadrant->b->brightness / state_image->b->brightness;
+    cost_c = quadrant->c->brightness / state_image->c->brightness;
+    cost_d = quadrant->d->brightness / state_image->d->brightness;
+
+    if( abs(cost_a - cost_b) < eps && abs(cost_a - cost_c) < eps && abs(cost_a - cost_d) < eps ) {
+
+        // If costs are equal add new transition into the appropriate matrix.
+
+        switch (quadrant_symbol) {
+            case 'a':
+                gsl_matrix_set(this->A, quadrant->parent->index, state_image->index, cost_a );
+            break;
+            case 'b':
+                gsl_matrix_set(this->B, quadrant->parent->index, state_image->index, cost_a );
+            break;
+            case 'c':
+                gsl_matrix_set(this->C, quadrant->parent->index, state_image->index, cost_a );
+            break;
+            case 'd':
+                gsl_matrix_set(this->D, quadrant->parent->index, state_image->index, cost_a );
+            break;
+        }
+
+    }else if(state_index < State::states_count - 1){
+
+        // If not, check other states
+        ScanState(quadrant, quadrant_symbol, state_index + 1, eps);
+
+    } else {
+        // Create new state
+
+        // Save matrices into initial matrices to copy data
+        Acpy = gsl_matrix_alloc(State::states_count, State::states_count);
+        Bcpy = gsl_matrix_alloc(State::states_count, State::states_count);
+        Ccpy = gsl_matrix_alloc(State::states_count, State::states_count);
+        Dcpy = gsl_matrix_alloc(State::states_count, State::states_count);
+        Fcpy = gsl_matrix_alloc(State::states_count, 1);
+
+        gsl_matrix_memcpy(Acpy, this->A);
+        gsl_matrix_memcpy(Bcpy, this->B);
+        gsl_matrix_memcpy(Ccpy, this->C);
+        gsl_matrix_memcpy(Dcpy, this->D);
+        gsl_matrix_memcpy(Fcpy, this->F);
+
+        gsl_matrix_free(this->A);
+        gsl_matrix_free(this->B);
+        gsl_matrix_free(this->C);
+        gsl_matrix_free(this->D);
+        gsl_matrix_free(this->F);
+
+        // Add new state and set the appropriate matrix index (line and col).
+
+        // Copy states into a saved array.
+        statescpy = new State*[State::states_count];
+        for (int i = 0; i < State::states_count; ++i) {
+            statescpy[i] = this->states[i];
+        }
+
+        // Do not free the elements of states[], because these are saved into statescpy[].
+        // Just free the state[] itself and create a bigger one.
+        delete[] this->states;
+        this->states = nullptr;
+
+        // If I create new state, states_count increments automatically.
+        State *new_state = new State(quadrant);
+        this->states = new State *[State::states_count];
+
+        // Copy the saved states into states[]
+        for (int i = 0; i < State::states_count - 1; ++i) {
+            this->states[i] = statescpy[i];
+        }
+
+        // Do not free the elements of statescpy[], because these are copied into states[].
+        // Just free the statescpy[] itself.
+        delete[] statescpy;
+        statescpy = nullptr;
+
+        //Add new state to states
+        states[State::states_count - 1] = new_state;
+
+        //New state represents the quadrant, so they have same index.
+        quadrant->index = new_state->index;
+
+        // expand the matrices
+        this->A = gsl_matrix_alloc(State::states_count, State::states_count);
+        this->B = gsl_matrix_alloc(State::states_count, State::states_count);
+        this->C = gsl_matrix_alloc(State::states_count, State::states_count);
+        this->D = gsl_matrix_alloc(State::states_count, State::states_count);
+        this->F = gsl_matrix_alloc(State::states_count, 1);
+
+        gsl_matrix_set_zero(this->A);
+        gsl_matrix_set_zero(this->B);
+        gsl_matrix_set_zero(this->C);
+        gsl_matrix_set_zero(this->D);
+        gsl_matrix_set_zero(this->F);
+
+        // Copy the contents of smaller matrices to bigger ones using initial matrices.
+        for (int i = 0; i < State::states_count; ++i) {
+            if( i < State::states_count - 1 ) {
+                gsl_matrix_set(this->F, i, 0, gsl_matrix_get(Fcpy, i, 0));
+
+                for (int j = 0; j < State::states_count - 1; ++j) {
+                    gsl_matrix_set(this->A, i, j, gsl_matrix_get(Acpy, i, j));
+                    gsl_matrix_set(this->B, i, j, gsl_matrix_get(Bcpy, i, j));
+                    gsl_matrix_set(this->C, i, j, gsl_matrix_get(Ccpy, i, j));
+                    gsl_matrix_set(this->D, i, j, gsl_matrix_get(Dcpy, i, j));
+                }
+            } else {
+                // Add new quadrant to F.
+                gsl_matrix_set(this->F, i, 0, quadrant->brightness);
+            }
+        }
+
+        //Set transition
+        switch (quadrant_symbol) {
+            case 'a':
+                gsl_matrix_set(this->A, quadrant->parent->index, new_state->index, 1 );
+            break;
+            case 'b':
+                gsl_matrix_set(this->B, quadrant->parent->index, new_state->index, 1 );
+            break;
+            case 'c':
+                gsl_matrix_set(this->C, quadrant->parent->index, new_state->index, 1 );
+            break;
+            case 'd':
+                gsl_matrix_set(this->D, quadrant->parent->index, new_state->index, 1 );
+            break;
+        }
+
+        gsl_matrix_free(Acpy);
+        gsl_matrix_free(Bcpy);
+        gsl_matrix_free(Ccpy);
+        gsl_matrix_free(Dcpy);
+        gsl_matrix_free(Fcpy);
+    }
+}
 
 double Coding::CreateQuadtree(int level, int index, int x, int y){
     // Count the average color of the image segment (quadrant) according to parameters.
 
     if(level > 0) {
-        int quadrant_size = 1 << level; // 2^level
-        double A, B, C, D; // The average colors of quadrants
-        A = CreateQuadtree(level-1, 4 * index + 1, x, y);
-        B = CreateQuadtree(level-1, 4 * index + 2, x + (int)(quadrant_size/2), y);
-        C = CreateQuadtree(level-1, 4 * index + 3, x, y + (int)(quadrant_size/2));
-        D = CreateQuadtree(level-1, 4 * index + 4, x + (int)(quadrant_size/2), y + (int)(quadrant_size/2));
+        const int quadrant_size = 1 << level; // 2^level
+        // The average colors of quadrants
+        const double A = CreateQuadtree(level-1, 4*index + 1, x, y);
+        const double B = CreateQuadtree(level-1, 4*index + 2, x + quadrant_size/2, y);
+        const double C = CreateQuadtree(level-1, 4*index + 3, x, y + quadrant_size/2);
+        const double D = CreateQuadtree(level-1, 4*index + 4, x + quadrant_size/2, y + quadrant_size/2);
 
         // Store quadrants in a quadtree
         // When level == 1, in the (n-1). recursion level a quadrant is sum of 4 pixels.
 
-        double quadrant_average_color = (A + B + C + D) / 4;
+        const double quadrant_average_color = (A + B + C + D) / 4;
 
         // g_print("%f\n", quadrant_average_color);
 
-        /* int index = 0;
-
-         // The first index of this level +
-         for (int i = 0; i < level; ++i) {
-             index += pow(4, i);
-         }
-
-         // +
-         index +=*/
-        this->quadtree[index] = quadrant_average_color;
+        this->quadtree[index] = new Quadrant(quadrant_average_color);
 
         return quadrant_average_color;
     }
 
     // else if level == 0, the n. recursion level, there are pixels.
-    int rowstride = gdk_pixbuf_get_rowstride(this->pixbuf);
+    const int rowstride = gdk_pixbuf_get_rowstride(this->pixbuf);
     guchar *pixels = gdk_pixbuf_get_pixels(this->pixbuf);
-    int n_channels = gdk_pixbuf_get_n_channels(this->pixbuf);
+    const int n_channels = gdk_pixbuf_get_n_channels(this->pixbuf);
 
-    guchar *p = pixels + x * rowstride + y * n_channels;
-    guchar r = p[0];
-    guchar g = p[1];
-    guchar b = p[2];
+    const guchar *p = pixels + x * rowstride + y * n_channels;
+    const guchar r = p[0];
+    const guchar g = p[1];
+    const guchar b = p[2];
+
+    //Do not store pixels, just the average.
 
     return (r + g + b) / 3; // Average color of the pixel
+}
+
+double Coding::round_to_decimal(double value, int decimal_places) {
+    double factor = pow(10.0, decimal_places);
+    return round(value * factor) / factor;
+}
+
+void Coding::ChildPointers() {
+    for (int i = 0; i < this->quadtree_size_1; ++i) {
+
+        int pi; // parent index
+        int ai, bi, ci, di; // children indexes
+
+        if(i < 5) {
+            pi = 0;
+        } else {
+            pi = (i - 1) / 4;
+        }
+        if( i < this->quadtree_size_2 ) {
+            ai = 4*i+1;
+            bi = 4*i+2;
+            ci = 4*i+3;
+            di = 4*i+4;
+        }
+        else {
+            ai = i;
+            bi = i;
+            ci = i;
+            di = i;
+        }
+        this->quadtree[i]->parent = quadtree[pi];
+        this->quadtree[i]->a = quadtree[ai];
+        this->quadtree[i]->b = quadtree[bi];
+        this->quadtree[i]->c = quadtree[ci];
+        this->quadtree[i]->d = quadtree[di];
+    }
+}
+
+void Coding::SaveWFA(const char *filename) {
+    FILE *file = fopen(filename, "w");
+    if (file == nullptr) {
+        perror("Failed to open file");
+        return;
+    }
+
+    fprintf(file, "%d\n\n", static_cast<int>(State::states_count));
+
+    for (size_t i = 0; i < this->F->size1; ++i) {
+        if(i < this->F->size1 - 1) {
+            fprintf(file, "%g ", gsl_matrix_get(F, i, 0));
+        } else {
+            fprintf(file, "%g", gsl_matrix_get(F, i, 0));
+        }
+    }
+
+    fprintf(file, "\n\n");
+
+    for (size_t i = 0; i < this->A->size1; ++i) {
+        for (size_t j = 0; j < this->A->size2; ++j) {
+            if(j < this->A->size2 - 1) {
+                fprintf(file, "%g ", gsl_matrix_get(A, i, j));
+            } else {
+                fprintf(file, "%g", gsl_matrix_get(A, i, j));
+            }
+        }
+        fprintf(file, "\n");
+    }
+
+    fprintf(file, "\n");
+
+    for (size_t i = 0; i < this->B->size1; ++i) {
+        for (size_t j = 0; j < this->B->size2; ++j) {
+            if(j < this->B->size2 - 1) {
+                fprintf(file, "%g ", gsl_matrix_get(B, i, j));
+            } else {
+                fprintf(file, "%g", gsl_matrix_get(B, i, j));
+            }
+        }
+        fprintf(file, "\n");
+    }
+
+    fprintf(file, "\n");
+
+    for (size_t i = 0; i < this->C->size1; ++i) {
+        for (size_t j = 0; j < this->C->size2; ++j) {
+            if(j < this->C->size2 - 1) {
+                fprintf(file, "%g ", gsl_matrix_get(C, i, j));
+            } else {
+                fprintf(file, "%g", gsl_matrix_get(C, i, j));
+            }
+        }
+        fprintf(file, "\n");
+    }
+
+    fprintf(file, "\n");
+
+    for (size_t i = 0; i < this->D->size1; ++i) {
+        for (size_t j = 0; j < this->D->size2; ++j) {
+            if(j < this->D->size2 - 1) {
+                fprintf(file, "%g ", gsl_matrix_get(D, i, j));
+            } else {
+                fprintf(file, "%g", gsl_matrix_get(D, i, j));
+            }
+        }
+        fprintf(file, "\n");
+    }
+
+    fclose(file);
 }

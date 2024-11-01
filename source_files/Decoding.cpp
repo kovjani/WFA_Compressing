@@ -1,5 +1,7 @@
 #include "../header_files/Decoding.h"
 
+#include <vector>
+
 Decoding::Decoding(char *filename, int depth){
     this->depth = depth;
     this->decoding_image_size = 1 << depth; // The size of the image (2^res)
@@ -15,7 +17,8 @@ Decoding::Decoding(char *filename, int depth){
         return;
     }
 
-    char line[256];
+    char line[4096];
+    char *end;
 
     // The first line is the size of the square matrices
     fgets(line, sizeof(line), wfa_file);
@@ -49,7 +52,7 @@ Decoding::Decoding(char *filename, int depth){
         char *token = strtok(line, " "); // Split by space
 
         for (int i = 0; i < this->n; ++i) {
-            gsl_matrix_set(this->F, i, 0, atof(token));
+            gsl_matrix_set(this->F, i, 0, std::strtod(token, &end));
             token = strtok(NULL, " "); // Get the next token
         }
 
@@ -64,7 +67,7 @@ Decoding::Decoding(char *filename, int depth){
         char *token = strtok(line, " "); // Split by space
 
         for (int j = 0; j < this->n; ++j) {
-            gsl_matrix_set(this->A, i, j, atof(token));
+            gsl_matrix_set(this->A, i, j, std::strtod(token, &end));
             token = strtok(NULL, " "); // Get the next token
         }
 
@@ -80,7 +83,7 @@ Decoding::Decoding(char *filename, int depth){
         char *token = strtok(line, " "); // Split by space
 
         for (int j = 0; j < this->n; ++j) {
-            gsl_matrix_set(this->B, i, j, atof(token));
+            gsl_matrix_set(this->B, i, j, std::strtod(token, &end));
             token = strtok(NULL, " "); // Get the next token
         }
 
@@ -96,7 +99,7 @@ Decoding::Decoding(char *filename, int depth){
         char *token = strtok(line, " "); // Split by space
 
         for (int j = 0; j < this->n; ++j) {
-            gsl_matrix_set(this->C, i, j, atof(token));
+            gsl_matrix_set(this->C, i, j, std::strtod(token, &end));
             token = strtok(NULL, " "); // Get the next token
         }
 
@@ -112,7 +115,7 @@ Decoding::Decoding(char *filename, int depth){
         char *token = strtok(line, " "); // Split by space
 
         for (int j = 0; j < this->n; ++j) {
-            gsl_matrix_set(this->D, i, j, atof(token));
+            gsl_matrix_set(this->D, i, j, std::strtod(token, &end));
             token = strtok(NULL, " "); // Get the next token
         }
 
