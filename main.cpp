@@ -4,7 +4,6 @@
 #include <math.h>
 #include "header_files/Coding.h"
 #include "header_files/Decoding.h"
-#include "header_files/Testing.h"
 
 void CodingFileChoosed(GtkFileChooserButton *clicked_button, GtkWidget *coding_button) {
     // Make compress button sensitive.

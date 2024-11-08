@@ -12,15 +12,15 @@ include_directories(${GTK_INCLUDE_DIRS})
 link_directories(${GTK_LIBRARY_DIRS})
 
 add_executable(WFA main.cpp
-        source_files/Testing.cpp
-        header_files/Testing.h
         source_files/Decoding.cpp
         header_files/Decoding.h
         source_files/Coding.cpp
         header_files/Coding.h
         source_files/Quadrant.cpp
         header_files/Quadrant.h
-        header_files/State.cpp
-        header_files/State.h)
+        source_files/State.cpp
+        header_files/State.h
+        source_files/Element.cpp
+        header_files/Element.h)
 
 target_link_libraries(WFA ${GTK_LIBRARIES} GSL::gsl GSL::gslcblas m)

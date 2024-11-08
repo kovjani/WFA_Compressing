@@ -1,6 +1,6 @@
 #include "../header_files/Decoding.h"
 
-#include <vector>
+#include "../header_files/Element.h"
 
 Decoding::Decoding(char *filename, int depth){
     this->depth = depth;
@@ -17,7 +17,8 @@ Decoding::Decoding(char *filename, int depth){
         return;
     }
 
-    char line[4096];
+    char line[16384];
+    // std::vector<char> line;
     char *end;
 
     // The first line is the size of the square matrices
@@ -26,24 +27,22 @@ Decoding::Decoding(char *filename, int depth){
 
     fgets(line, sizeof(line), wfa_file);     // \n
 
+    // Allocate memory
+    this->Inn = new Element*[this->n];
+    this->F = new Element*[this->n];
 
-
-    // Allocate memory for the matrices
-    this->I = gsl_matrix_alloc(1, this->n);
-    this->F = gsl_matrix_alloc(this->n, 1);
-
-    this->Inn = gsl_matrix_alloc(this->n, this->n);
-
-    this->A = gsl_matrix_alloc(this->n, this->n);
-    this->B = gsl_matrix_alloc(this->n, this->n);
-    this->C = gsl_matrix_alloc(this->n, this->n);
-    this->D = gsl_matrix_alloc(this->n, this->n);
+    this->A = new Element*[this->n];
+    this->B = new Element*[this->n];
+    this->C = new Element*[this->n];
+    this->D = new Element*[this->n];
 
     // Initialize I
-    gsl_matrix_set_identity(this->I);
+    this->I = new Element(1, 0);
 
     // Initialize the Inn, it's an nxn identity matrix for the first call.
-    gsl_matrix_set_identity(this->Inn);
+    for (int i = 0; i < this->n; ++i) {
+        this->Inn[i] = new Element(1, i);
+    }
 
     // Initialize F
     // The second line is the F (n*1 matrix), the average colors of states.
@@ -52,7 +51,7 @@ Decoding::Decoding(char *filename, int depth){
         char *token = strtok(line, " "); // Split by space
 
         for (int i = 0; i < this->n; ++i) {
-            gsl_matrix_set(this->F, i, 0, std::strtod(token, &end));
+            this->F[i] = new Element(std::strtod(token, &end), 0);
             token = strtok(NULL, " "); // Get the next token
         }
 
@@ -66,10 +65,13 @@ Decoding::Decoding(char *filename, int depth){
         fgets(line, sizeof(line), wfa_file);
         char *token = strtok(line, " "); // Split by space
 
-        for (int j = 0; j < this->n; ++j) {
-            gsl_matrix_set(this->A, i, j, std::strtod(token, &end));
-            token = strtok(NULL, " "); // Get the next token
-        }
+        int j= std::strtod(token, &end);
+        token = strtok(NULL, " "); // Get the next token
+
+        double value = std::strtod(token, &end);
+        token = strtok(NULL, " "); // Get the next token
+
+        this->A[i] = new Element(value, j);
 
         g_free(token);
     }
@@ -82,10 +84,13 @@ Decoding::Decoding(char *filename, int depth){
         fgets(line, sizeof(line), wfa_file);
         char *token = strtok(line, " "); // Split by space
 
-        for (int j = 0; j < this->n; ++j) {
-            gsl_matrix_set(this->B, i, j, std::strtod(token, &end));
-            token = strtok(NULL, " "); // Get the next token
-        }
+        int j = std::strtod(token, &end);
+        token = strtok(NULL, " "); // Get the next token
+
+        double value = std::strtod(token, &end);
+        token = strtok(NULL, " "); // Get the next token
+
+        this->B[i] = new Element(value, j);
 
         g_free(token);
     }
@@ -98,10 +103,13 @@ Decoding::Decoding(char *filename, int depth){
         fgets(line, sizeof(line), wfa_file);
         char *token = strtok(line, " "); // Split by space
 
-        for (int j = 0; j < this->n; ++j) {
-            gsl_matrix_set(this->C, i, j, std::strtod(token, &end));
-            token = strtok(NULL, " "); // Get the next token
-        }
+        int j = std::strtod(token, &end);
+        token = strtok(NULL, " "); // Get the next token
+
+        double value = std::strtod(token, &end);
+        token = strtok(NULL, " "); // Get the next token
+
+        this->C[i] = new Element(value, j);
 
         g_free(token);
     }
@@ -114,79 +122,32 @@ Decoding::Decoding(char *filename, int depth){
         fgets(line, sizeof(line), wfa_file);
         char *token = strtok(line, " "); // Split by space
 
-        for (int j = 0; j < this->n; ++j) {
-            gsl_matrix_set(this->D, i, j, std::strtod(token, &end));
-            token = strtok(NULL, " "); // Get the next token
-        }
+        int j = std::strtod(token, &end);
+        token = strtok(NULL, " "); // Get the next token
+
+        double value = std::strtod(token, &end);
+        token = strtok(NULL, " "); // Get the next token
+
+        this->D[i] = new Element(value, j);
 
         g_free(token);
     }
 }
 
-Decoding::Decoding(gsl_matrix *a, gsl_matrix *b, gsl_matrix *c, gsl_matrix *d, gsl_matrix *f, int n, int depth, bool testing)
-    : n(n), depth(depth), testing(testing) {
-
-    // Allocate memory for the matrices
-    this->I = gsl_matrix_alloc(1, this->n);
-    this->F = gsl_matrix_alloc(this->n, 1);
-
-    this->Inn = gsl_matrix_alloc(this->n, this->n);
-
-    this->A = gsl_matrix_alloc(this->n, this->n);
-    this->B = gsl_matrix_alloc(this->n, this->n);
-    this->C = gsl_matrix_alloc(this->n, this->n);
-    this->D = gsl_matrix_alloc(this->n, this->n);
-
-    // Initialize matrices
-    gsl_matrix_set_identity(this->I);
-    gsl_matrix_set_identity(this->Inn);
-
-    gsl_matrix_memcpy(this->A, a);
-    gsl_matrix_memcpy(this->B, b);
-    gsl_matrix_memcpy(this->C, c);
-    gsl_matrix_memcpy(this->D, d);
-    gsl_matrix_memcpy(this->F, f);
-
-    this->decoding_image_size = 1 << depth; // The size of the image (2^res)
-    this->pixels_colors = (double *)malloc(decoding_image_size*decoding_image_size*sizeof(double));
-}
-
 Decoding::~Decoding() {
     // Free the allocated memory
-    gsl_matrix_free(this->A);
-    gsl_matrix_free(this->B);
-    gsl_matrix_free(this->C);
-    gsl_matrix_free(this->D);
 
-    gsl_matrix_free(this->Inn);
+    free_array_of_elements(this->A, this->n);
+    free_array_of_elements(this->B, this->n);
+    free_array_of_elements(this->C, this->n);
+    free_array_of_elements(this->D, this->n);
+    free_array_of_elements(this->Inn, this->n);
+    free_array_of_elements(this->F, this->n);
 
-    gsl_matrix_free(this->I);
-    gsl_matrix_free(this->F);
+    delete this->I;
 
-    g_free(this->pixels_colors);
+    delete this->pixels_colors;
 }
-
-/*int Decoding::getN() const {
-    return this->n;
-}
-int Decoding::getDepth() const {
-    return this->depth;
-}
-gsl_matrix *Decoding::getA() const {
-    return this->A;
-}
-gsl_matrix *Decoding::getB() const {
-    return this->B;
-}
-gsl_matrix *Decoding::getC() const {
-    return this->C;
-}
-gsl_matrix *Decoding::getD() const {
-    return this->D;
-}
-gsl_matrix *Decoding::getF() const {
-    return this->F;
-}*/
 
 void Decoding::Start(char *directory, char *saved_filename) {
     DecodePixelsColors(this->depth, 0, 0, this->I, this->Inn);
@@ -197,6 +158,67 @@ void Decoding::Start(char *directory, char *saved_filename) {
     }
 
     g_free(saved_file_path);
+}
+
+void Decoding::DecodePixelsColors(int level, int x, int y, const Element* &previous_matrix, Element **next_matrix) {
+
+    if(level > 0 ) {
+        double value = 0;
+        int res_j = 0;
+
+        // Matrix multiplication
+        // Previous_matrix always has one element, because the automata is deterministic.
+        const Element *pre = previous_matrix;
+        for (int i = 0; i < this->n; ++i) {
+            Element *next = next_matrix[i];
+            // i = next->i
+            if(pre->j == i) {
+                value = pre->value * next->value;
+                // pre->i is always 0, because the previous matrix is a row vector
+                res_j = next->j;
+                break;
+            }
+        }
+
+        const Element* result = new Element(value, res_j);
+        int quadrant_size = 1 << level; // 2^level
+
+        DecodePixelsColors(level-1, x, y, result, this->A);
+        DecodePixelsColors(level-1, x + quadrant_size/2, y, result, this->B);
+        DecodePixelsColors(level-1, x, y + quadrant_size/2, result, this->C);
+        DecodePixelsColors(level-1, x + quadrant_size/2, y + quadrant_size/2,result, this->D);
+
+        delete result;
+    }
+    // else
+    // Pixels
+    double average_color = 0;
+    const Element *pre = previous_matrix;
+
+    for (int i = 0; i < this->n; ++i) {
+        // i = this->F[i]->i
+        if(pre->j == i) {
+            average_color = pre->value * this->F[i]->value;
+            break;
+        }
+    }
+
+    this->pixels_colors[x * this->decoding_image_size + y] = average_color;
+}
+
+void Decoding::free_array_of_elements(Element** &arr, int size) {
+    for (int i = 0; i < size; ++i) {
+        delete arr[i];
+        arr[i] = nullptr;
+    }
+    delete[] arr;
+}
+
+void Decoding::free_vector_of_elements(std::vector<Element*> &vec) {
+    for (int i = 0; i < vec.size(); ++i) {
+        delete vec[i];
+        vec[i] = nullptr;
+    }
 }
 
 void Decoding::OpenImage(char *full_path) const{
@@ -246,38 +268,4 @@ char *Decoding::SaveDecodedImage(char *directory, char *filename) const {
     g_object_unref(pixbuf);
 
     return filename_with_path;
-}
-
-double Decoding::DecodePixelsColors(int level, int x, int y, gsl_matrix *previous_matrix, gsl_matrix *next_matrix) {
-
-    gsl_matrix *result = gsl_matrix_alloc(1, this->n);
-
-    // matrix multiplication
-    gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, previous_matrix, next_matrix, 0.0, result);
-
-    int quadrant_size = 1 << level; // 2^level
-
-    if(level > 0) {
-        double a = DecodePixelsColors(level-1, x, y, result, this->A);
-        double b = DecodePixelsColors(level-1, x + (int)(quadrant_size/2), y, result, this->B);
-        double c = DecodePixelsColors(level-1, x, y + (int)(quadrant_size/2), result, this->C);
-        double d = DecodePixelsColors(level-1, x + (int)(quadrant_size/2), y + (int)(quadrant_size/2),result, this->D);
-
-        gsl_matrix_free(result);
-
-        return (a+b+c+d)/4;
-    }
-    // else
-    // Pixels
-    gsl_matrix *average_color = gsl_matrix_alloc(1, 1);
-    gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, result, this->F, 0.0, average_color);
-
-    this->pixels_colors[y * this->decoding_image_size + x] = gsl_matrix_get(average_color, 0, 0);
-
-    double avg_color = gsl_matrix_get(average_color, 0, 0);
-
-    gsl_matrix_free(average_color);
-    gsl_matrix_free(result);
-
-    return avg_color;
 }

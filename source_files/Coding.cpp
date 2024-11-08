@@ -112,14 +112,14 @@ void Coding::CreateWFA(double epsilon) {
 
         State *scanned_state = this->states[i];
 
-        ScanState(scanned_state->a, 'a', i, epsilon);
-        ScanState(scanned_state->b, 'c', i, epsilon);
-        ScanState(scanned_state->c, 'b', i, epsilon);
-        ScanState(scanned_state->d, 'd', i, epsilon);
+        ScanState(scanned_state->a, 'a', i);
+        ScanState(scanned_state->b, 'b', i);
+        ScanState(scanned_state->c, 'c', i);
+        ScanState(scanned_state->d, 'd', i);
     }
 }
 
-void Coding::ScanState(Quadrant *quadrant, char quadrant_symbol, int state_index, double eps) {
+void Coding::ScanState(Quadrant *quadrant, char quadrant_symbol, int state_index) {
 
     // state image vs quadrant
 
@@ -127,38 +127,34 @@ void Coding::ScanState(Quadrant *quadrant, char quadrant_symbol, int state_index
 
     gsl_matrix *Acpy, *Bcpy, *Ccpy, *Dcpy, *Fcpy;
     State **statescpy;
-    double cost_a, cost_b, cost_c, cost_d;
 
     // Compare scanned quadrant's children and appropriate grandchildren of a parent.
     // quadrant vs state_image
-    cost_a = quadrant->a->brightness / state_image->a->brightness;
-    cost_b = quadrant->b->brightness / state_image->b->brightness;
-    cost_c = quadrant->c->brightness / state_image->c->brightness;
-    cost_d = quadrant->d->brightness / state_image->d->brightness;
 
-    if( abs(cost_a - cost_b) < eps && abs(cost_a - cost_c) < eps && abs(cost_a - cost_d) < eps ) {
+    double cost = CompareQuadrants(this->depth - state_index, quadrant, state_image);
+    if( cost != -1 ) {
 
         // If costs are equal add new transition into the appropriate matrix.
 
         switch (quadrant_symbol) {
             case 'a':
-                gsl_matrix_set(this->A, quadrant->parent->index, state_image->index, cost_a );
+                gsl_matrix_set(this->A, quadrant->parent->index, state_image->index, cost );
             break;
             case 'b':
-                gsl_matrix_set(this->B, quadrant->parent->index, state_image->index, cost_a );
+                gsl_matrix_set(this->B, quadrant->parent->index, state_image->index, cost );
             break;
             case 'c':
-                gsl_matrix_set(this->C, quadrant->parent->index, state_image->index, cost_a );
+                gsl_matrix_set(this->C, quadrant->parent->index, state_image->index, cost );
             break;
             case 'd':
-                gsl_matrix_set(this->D, quadrant->parent->index, state_image->index, cost_a );
+                gsl_matrix_set(this->D, quadrant->parent->index, state_image->index, cost );
             break;
         }
 
     }else if(state_index < State::states_count - 1){
 
         // If not, check other states
-        ScanState(quadrant, quadrant_symbol, state_index + 1, eps);
+        ScanState(quadrant, quadrant_symbol, state_index + 1);
 
     } else {
         // Create new state
@@ -268,6 +264,29 @@ void Coding::ScanState(Quadrant *quadrant, char quadrant_symbol, int state_index
         gsl_matrix_free(Fcpy);
     }
 }
+
+double Coding::CompareQuadrants(int level, Quadrant *q1, Quadrant *q2) {
+    double cost_a, cost_b, cost_c, cost_d;
+    if(level > 1) {
+
+        cost_a = CompareQuadrants(level - 1, q1->a, q2->a);
+        cost_b = CompareQuadrants(level - 1, q1->b, q2->b);
+        cost_c = CompareQuadrants(level - 1, q1->c, q2->c);
+        cost_d = CompareQuadrants(level - 1, q1->d, q2->d);
+
+    } else {
+        cost_a = q1->a->brightness / q2->a->brightness;
+        cost_b = q1->b->brightness / q2->b->brightness;
+        cost_c = q1->c->brightness / q2->c->brightness;
+        cost_d = q1->d->brightness / q2->d->brightness;
+    }
+
+    if( abs(cost_a - cost_b) < this->EPS && abs(cost_a - cost_c) < this->EPS && abs(cost_a - cost_d) < this->EPS  ){
+        return cost_a;
+    }
+    return -1;
+}
+
 
 double Coding::CreateQuadtree(int level, int index, int x, int y){
     // Count the average color of the image segment (quadrant) according to parameters.
