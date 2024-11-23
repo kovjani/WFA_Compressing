@@ -4,41 +4,41 @@
 #include <iostream>
 #include <string>
 #include <math.h>
-#include <vector>
+#include <algorithm>
+#include <thread>
 #include <gtk/gtk.h>
-#include <gsl/gsl_matrix.h>
-#include <gsl/gsl_blas.h>
+#include <glib.h>
 
 #include "Quadrant.h"
-#include "State.h"
+#include "Element.h"
+
+using namespace std;
 
 class Coding {
 public:
     Coding() = default;
-    explicit Coding(const char *filename);
+    explicit Coding(const char *filename, double epsilon);
     ~Coding();
     void Start();
-    double round_to_decimal(double value, int decimal_places);
 
 private:
-    GError *error = nullptr;
+    GError *error{nullptr};
     GdkPixbuf *pixbuf{};
-    gsl_matrix *A{}, *B{}, *C{}, *D{}, *F{};
-    Quadrant **quadtree{};
-    State **states{};
-    int width{};
-    int height{};
-    int coding_image_size{};
-    int depth{};
-    int quadtree_size_1{}; // Quadtree depth - 1 size
-    int quadtree_size_2{}; // Quadtree depth - 2 size
-    int quadtree_size_3{}; // Quadtree depth - 3 size
-    double EPS{0.1};
-    double CreateQuadtree(int level, int index, int x, int y);
-    void ChildPointers();
-    void CreateWFA(double epsilon);
-    void ScanState(Quadrant *quadrant, char quadrant_symbol, int state_index);
-    double CompareQuadrants(int level, Quadrant *q1, Quadrant *q2);
+    Element **A{}, **B{}, **C{}, **D{};
+    Quadrant **quadtree{}, **states{};
+    int width{0};
+    int height{0};
+    int coding_image_size{0};
+    int depth{0};
+    int quadtree_size{0}; // Quadtree size
+    double EPS{0.0001};
+    int calling_counter{0};
+    int states_counter{0};
+
+    Quadrant *CreateQuadtree(int level, int index, int x, int y);
+    void CreateWFA();
+    void ScanState(Quadrant &quadrant, char quadrant_symbol, int state_index, int *quadrant_index);
+    [[nodiscard]] double CompareQuadrants(const Quadrant &q1, const Quadrant &q2) const;
     void SaveWFA(const char *filename);
 };
 

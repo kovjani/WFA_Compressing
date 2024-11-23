@@ -77,13 +77,6 @@ build CMakeFiles/WFA.dir/source_files/Quadrant.cpp.o: CXX_COMPILER__WFA_unscanne
   OBJECT_DIR = CMakeFiles/WFA.dir
   OBJECT_FILE_DIR = CMakeFiles/WFA.dir/source_files
 
-build CMakeFiles/WFA.dir/source_files/State.cpp.o: CXX_COMPILER__WFA_unscanned_Debug /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/source_files/State.cpp || cmake_object_order_depends_target_WFA
-  DEP_FILE = CMakeFiles/WFA.dir/source_files/State.cpp.o.d
-  FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/fribidi -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gio-unix-2.0 -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include
-  OBJECT_DIR = CMakeFiles/WFA.dir
-  OBJECT_FILE_DIR = CMakeFiles/WFA.dir/source_files
-
 build CMakeFiles/WFA.dir/source_files/Element.cpp.o: CXX_COMPILER__WFA_unscanned_Debug /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/source_files/Element.cpp || cmake_object_order_depends_target_WFA
   DEP_FILE = CMakeFiles/WFA.dir/source_files/Element.cpp.o.d
   FLAGS = -g -fdiagnostics-color=always
@@ -99,7 +92,7 @@ build CMakeFiles/WFA.dir/source_files/Element.cpp.o: CXX_COMPILER__WFA_unscanned
 #############################################
 # Link the executable WFA
 
-build WFA: CXX_EXECUTABLE_LINKER__WFA_Debug CMakeFiles/WFA.dir/main.cpp.o CMakeFiles/WFA.dir/source_files/Decoding.cpp.o CMakeFiles/WFA.dir/source_files/Coding.cpp.o CMakeFiles/WFA.dir/source_files/Quadrant.cpp.o CMakeFiles/WFA.dir/source_files/State.cpp.o CMakeFiles/WFA.dir/source_files/Element.cpp.o | /usr/lib/x86_64-linux-gnu/libgsl.so /usr/lib/x86_64-linux-gnu/libgslcblas.so
+build WFA: CXX_EXECUTABLE_LINKER__WFA_Debug CMakeFiles/WFA.dir/main.cpp.o CMakeFiles/WFA.dir/source_files/Decoding.cpp.o CMakeFiles/WFA.dir/source_files/Coding.cpp.o CMakeFiles/WFA.dir/source_files/Quadrant.cpp.o CMakeFiles/WFA.dir/source_files/Element.cpp.o | /usr/lib/x86_64-linux-gnu/libgsl.so /usr/lib/x86_64-linux-gnu/libgslcblas.so
   FLAGS = -g
   LINK_LIBRARIES = -lgtk-3  -lgdk-3  -lz  -lpangocairo-1.0  -lpango-1.0  -lharfbuzz  -latk-1.0  -lcairo-gobject  -lcairo  -lgdk_pixbuf-2.0  -lgio-2.0  -lgobject-2.0  -lglib-2.0  /usr/lib/x86_64-linux-gnu/libgsl.so  /usr/lib/x86_64-linux-gnu/libgslcblas.so  -lm
   OBJECT_DIR = CMakeFiles/WFA.dir

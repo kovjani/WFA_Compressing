@@ -18,8 +18,6 @@ add_executable(WFA main.cpp
         header_files/Coding.h
         source_files/Quadrant.cpp
         header_files/Quadrant.h
-        source_files/State.cpp
-        header_files/State.h
         source_files/Element.cpp
         header_files/Element.h)
 

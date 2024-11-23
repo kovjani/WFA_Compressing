@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <gtk/gtk.h>
+#include <glib.h>
 #include <math.h>
 #include "header_files/Coding.h"
 #include "header_files/Decoding.h"
@@ -27,7 +28,7 @@ void onCodingClicked(GtkWidget *clicked_button, GtkWidget *file_chooser_button) 
     char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_chooser_button));
     char *directory = g_path_get_dirname(filename);
 
-    Coding code(filename);
+    Coding code(filename, 0.01);
     code.Start();
 
     g_free(filename);
@@ -38,8 +39,8 @@ void onDecodingClicked(GtkWidget *clicked_button, GtkWidget *file_chooser_button
     char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_chooser_button));
     char *directory = g_path_get_dirname(filename);
 
-    Decoding decode(filename, 9);
-    decode.Start(directory, "wfa_image");
+    Decoding decode(filename, 9, 1);
+    decode.Start(directory, "wfa_image.png");
 
     g_free(filename);
     g_free(directory);
@@ -53,7 +54,7 @@ int main(int argc, char *argv[]) {
 
     // Load the Glade file.
     GtkBuilder *builder = gtk_builder_new();
-    if (!gtk_builder_add_from_file(builder, "../View/mainWindow.glade", NULL)) {
+    if (!gtk_builder_add_from_file(builder, "../View/mainWindow.glade", nullptr)) {
         g_printerr("Error loading mainWindow.glade\n");
         return 1;
     }
@@ -87,7 +88,7 @@ int main(int argc, char *argv[]) {
     g_signal_connect(coding_page_button, "clicked", G_CALLBACK(SwitchToCoding), stack);
     g_signal_connect(decoding_page_button, "clicked", G_CALLBACK(SwitchToDeCoding), stack);
 
-    gtk_builder_connect_signals(builder, NULL);
+    gtk_builder_connect_signals(builder, nullptr);
     g_object_unref(builder);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 

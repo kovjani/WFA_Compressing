@@ -7,7 +7,7 @@ public:
     int index{0};
 
     // Don't need free these pointers, because in this claas there is no memory allocation.
-    Quadrant *parent;
+    Quadrant *parent{};
     //Children
     Quadrant *a{}, *b{}, *c{}, *d{};
 

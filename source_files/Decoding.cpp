@@ -2,30 +2,33 @@
 
 #include "../header_files/Element.h"
 
-Decoding::Decoding(char *filename, int depth){
+Decoding::Decoding(char *filename, int depth, double intensity) {
     this->depth = depth;
     this->decoding_image_size = 1 << depth; // The size of the image (2^res)
 
     this->pixels_colors = (double *)malloc(this->decoding_image_size*this->decoding_image_size*sizeof(double));
 
     // Open a file in read mode
-    FILE *wfa_file = fopen(filename, "r");
+    // FILE *wfa_file = fopen(filename, "r");
+
+    string line, token;
+
+    ifstream wfa_file(filename);
 
     // Check if the file was opened successfully
-    if (wfa_file == NULL) {
-        g_print("Failed to open the file.\n");
-        return;
-    }
+    /* if (wfa_file == NULL) {
+         g_print("Failed to open the file.\n");
+         return;
+     }*/
 
-    char line[16384];
+    // char line[10000000];
     // std::vector<char> line;
-    char *end;
 
     // The first line is the size of the square matrices
-    fgets(line, sizeof(line), wfa_file);
-    this->n = atoi(line);
+    getline(wfa_file, line);
+    this->n = stoi(line);
 
-    fgets(line, sizeof(line), wfa_file);     // \n
+    getline(wfa_file, line);     // \n
 
     // Allocate memory
     this->Inn = new Element*[this->n];
@@ -37,100 +40,92 @@ Decoding::Decoding(char *filename, int depth){
     this->D = new Element*[this->n];
 
     // Initialize I
-    this->I = new Element(1, 0);
+    // start state
+    this->I = new Element(0, intensity);
 
     // Initialize the Inn, it's an nxn identity matrix for the first call.
     for (int i = 0; i < this->n; ++i) {
-        this->Inn[i] = new Element(1, i);
+        this->Inn[i] = new Element(i, 1);
     }
 
     // Initialize F
     // The second line is the F (n*1 matrix), the average colors of states.
     {
-        fgets(line, sizeof(line), wfa_file);
-        char *token = strtok(line, " "); // Split by space
+        getline(wfa_file, line);
+        stringstream line_stream(line);
 
         for (int i = 0; i < this->n; ++i) {
-            this->F[i] = new Element(std::strtod(token, &end), 0);
-            token = strtok(NULL, " "); // Get the next token
+            getline(line_stream, token, ' '); // Split line by space and get the next token
+            this->F[i] = new Element(0, stod(token) * 255);
         }
-
-        g_free(token);
     }
-    fgets(line, sizeof(line), wfa_file);     // \n
+
+    getline(wfa_file, line);    // \n
 
     // Initialize matrix A
     for (int i = 0; i < this->n; ++i) {
 
-        fgets(line, sizeof(line), wfa_file);
-        char *token = strtok(line, " "); // Split by space
+        getline(wfa_file, line);
+        stringstream line_stream(line);
 
-        int j= std::strtod(token, &end);
-        token = strtok(NULL, " "); // Get the next token
+        getline(line_stream, token, ' ');
+        int j= stoi(token);
 
-        double value = std::strtod(token, &end);
-        token = strtok(NULL, " "); // Get the next token
+        getline(line_stream, token, ' ');
+        double value = stod(token);
 
-        this->A[i] = new Element(value, j);
-
-        g_free(token);
+        this->A[i] = new Element(j, value);
     }
 
-    fgets(line, sizeof(line), wfa_file);     // \n
+    getline(wfa_file, line);     // \n
 
     // Initialize matrix B
     for (int i = 0; i < this->n; ++i) {
 
-        fgets(line, sizeof(line), wfa_file);
-        char *token = strtok(line, " "); // Split by space
+        getline(wfa_file, line);
+        stringstream line_stream(line);
 
-        int j = std::strtod(token, &end);
-        token = strtok(NULL, " "); // Get the next token
+        getline(line_stream, token, ' ');
+        int j= stoi(token);
 
-        double value = std::strtod(token, &end);
-        token = strtok(NULL, " "); // Get the next token
+        getline(line_stream, token, ' ');
+        double value = stod(token);
 
-        this->B[i] = new Element(value, j);
-
-        g_free(token);
+        this->B[i] = new Element(j, value);
     }
 
-    fgets(line, sizeof(line), wfa_file);     // \n
+    getline(wfa_file, line);     // \n
 
     // Initialize matrix C
     for (int i = 0; i < this->n; ++i) {
 
-        fgets(line, sizeof(line), wfa_file);
-        char *token = strtok(line, " "); // Split by space
+        getline(wfa_file, line);
+        stringstream line_stream(line);
 
-        int j = std::strtod(token, &end);
-        token = strtok(NULL, " "); // Get the next token
+        getline(line_stream, token, ' ');
+        int j= stoi(token);
 
-        double value = std::strtod(token, &end);
-        token = strtok(NULL, " "); // Get the next token
+        getline(line_stream, token, ' ');
+        double value = stod(token);
 
-        this->C[i] = new Element(value, j);
-
-        g_free(token);
+        this->C[i] = new Element(j, value);
     }
 
-    fgets(line, sizeof(line), wfa_file);     // \n
+    getline(wfa_file, line);    // \n
 
     // Initialize matrix D
     for (int i = 0; i < this->n; ++i) {
 
-        fgets(line, sizeof(line), wfa_file);
-        char *token = strtok(line, " "); // Split by space
+        getline(wfa_file, line);
+        stringstream line_stream(line);
 
-        int j = std::strtod(token, &end);
-        token = strtok(NULL, " "); // Get the next token
+        getline(line_stream, token, ' ');
+        int j= stoi(token);
 
-        double value = std::strtod(token, &end);
-        token = strtok(NULL, " "); // Get the next token
+        getline(line_stream, token, ' ');
+        double value = stod(token);
 
-        this->D[i] = new Element(value, j);
-
-        g_free(token);
+        this->D[i] = new Element(j, value);
     }
 }
 
@@ -162,6 +157,14 @@ void Decoding::Start(char *directory, char *saved_filename) {
 
 void Decoding::DecodePixelsColors(int level, int x, int y, const Element* &previous_matrix, Element **next_matrix) {
 
+    // Process GTK events to keep the UI responsive
+    this->calling_counter++;
+    if(this->calling_counter % 10000 == 0) {
+        g_print(".");
+        while (gtk_events_pending())
+            gtk_main_iteration();
+    }
+
     if(level > 0 ) {
         double value = 0;
         int res_j = 0;
@@ -180,7 +183,7 @@ void Decoding::DecodePixelsColors(int level, int x, int y, const Element* &previ
             }
         }
 
-        const Element* result = new Element(value, res_j);
+        const Element* result = new Element(res_j, value);
         int quadrant_size = 1 << level; // 2^level
 
         DecodePixelsColors(level-1, x, y, result, this->A);
@@ -189,6 +192,8 @@ void Decoding::DecodePixelsColors(int level, int x, int y, const Element* &previ
         DecodePixelsColors(level-1, x + quadrant_size/2, y + quadrant_size/2,result, this->D);
 
         delete result;
+
+        return;
     }
     // else
     // Pixels
@@ -214,13 +219,6 @@ void Decoding::free_array_of_elements(Element** &arr, int size) {
     delete[] arr;
 }
 
-void Decoding::free_vector_of_elements(std::vector<Element*> &vec) {
-    for (int i = 0; i < vec.size(); ++i) {
-        delete vec[i];
-        vec[i] = nullptr;
-    }
-}
-
 void Decoding::OpenImage(char *full_path) const{
     
     GtkWidget *window;
@@ -230,7 +228,7 @@ void Decoding::OpenImage(char *full_path) const{
     //gtk_init(&argc, &argv);
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "Image Loader");
+    gtk_window_set_title(GTK_WINDOW(window), "WFA Image");
     gtk_window_set_default_size(GTK_WINDOW(window), 400, 300);
 
     vbox = gtk_vbox_new(FALSE, 5);
@@ -255,10 +253,10 @@ char *Decoding::SaveDecodedImage(char *directory, char *filename) const {
     int rowstride = gdk_pixbuf_get_rowstride(pixbuf);
     int n_channels = gdk_pixbuf_get_n_channels(pixbuf);
 
-    for (int y = 0; y < this->decoding_image_size; ++y) {
-        for (int x = 0; x < this->decoding_image_size; ++x) {
-            guchar *p = pixels + y * rowstride + x * n_channels;
-            p[0] = p[1] = p[2] = this->pixels_colors[y * this->decoding_image_size + x]; // Set R, G, B to the grayscale value
+    for (int x = 0; x < this->decoding_image_size; ++x) {
+        for (int y = 0; y < this->decoding_image_size; ++y) {
+            guchar *p = pixels + x * rowstride + y * n_channels;
+            p[0] = p[1] = p[2] = this->pixels_colors[x * this->decoding_image_size + y]; // Set R, G, B to the grayscale value
         }
     }
     char *filename_with_path = g_build_filename(directory, filename, NULL);
