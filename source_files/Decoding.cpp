@@ -1,6 +1,6 @@
 #include "../header_files/Decoding.h"
 
-#include "../header_files/Element.h"
+#include "../header_files/Transition.h"
 
 Decoding::Decoding(char *filename, int depth, double intensity) {
     this->depth = depth;
@@ -31,21 +31,21 @@ Decoding::Decoding(char *filename, int depth, double intensity) {
     getline(wfa_file, line);     // \n
 
     // Allocate memory
-    this->Inn = new Element*[this->n];
-    this->F = new Element*[this->n];
+    this->Inn = new Transition*[this->n];
+    this->F = new Transition*[this->n];
 
-    this->A = new Element*[this->n];
-    this->B = new Element*[this->n];
-    this->C = new Element*[this->n];
-    this->D = new Element*[this->n];
+    this->A = new Transition*[this->n];
+    this->B = new Transition*[this->n];
+    this->C = new Transition*[this->n];
+    this->D = new Transition*[this->n];
 
     // Initialize I
     // start state
-    this->I = new Element(0, intensity);
+    this->I = new Transition(0, intensity);
 
     // Initialize the Inn, it's an nxn identity matrix for the first call.
     for (int i = 0; i < this->n; ++i) {
-        this->Inn[i] = new Element(i, 1);
+        this->Inn[i] = new Transition(i, 1);
     }
 
     // Initialize F
@@ -56,7 +56,7 @@ Decoding::Decoding(char *filename, int depth, double intensity) {
 
         for (int i = 0; i < this->n; ++i) {
             getline(line_stream, token, ' '); // Split line by space and get the next token
-            this->F[i] = new Element(0, stod(token) * 255);
+            this->F[i] = new Transition(0, stod(token) * 255);
         }
     }
 
@@ -74,7 +74,7 @@ Decoding::Decoding(char *filename, int depth, double intensity) {
         getline(line_stream, token, ' ');
         double value = stod(token);
 
-        this->A[i] = new Element(j, value);
+        this->A[i] = new Transition(j, value);
     }
 
     getline(wfa_file, line);     // \n
@@ -91,7 +91,7 @@ Decoding::Decoding(char *filename, int depth, double intensity) {
         getline(line_stream, token, ' ');
         double value = stod(token);
 
-        this->B[i] = new Element(j, value);
+        this->B[i] = new Transition(j, value);
     }
 
     getline(wfa_file, line);     // \n
@@ -108,7 +108,7 @@ Decoding::Decoding(char *filename, int depth, double intensity) {
         getline(line_stream, token, ' ');
         double value = stod(token);
 
-        this->C[i] = new Element(j, value);
+        this->C[i] = new Transition(j, value);
     }
 
     getline(wfa_file, line);    // \n
@@ -125,7 +125,7 @@ Decoding::Decoding(char *filename, int depth, double intensity) {
         getline(line_stream, token, ' ');
         double value = stod(token);
 
-        this->D[i] = new Element(j, value);
+        this->D[i] = new Transition(j, value);
     }
 }
 
@@ -155,7 +155,7 @@ void Decoding::Start(char *directory, char *saved_filename) {
     g_free(saved_file_path);
 }
 
-void Decoding::DecodePixelsColors(int level, int x, int y, const Element* &previous_matrix, Element **next_matrix) {
+void Decoding::DecodePixelsColors(int level, int x, int y, const Transition* &previous_matrix, Transition **next_matrix) {
 
     // Process GTK events to keep the UI responsive
     this->calling_counter++;
@@ -171,9 +171,9 @@ void Decoding::DecodePixelsColors(int level, int x, int y, const Element* &previ
 
         // Matrix multiplication
         // Previous_matrix always has one element, because the automata is deterministic.
-        const Element *pre = previous_matrix;
+        const Transition *pre = previous_matrix;
         for (int i = 0; i < this->n; ++i) {
-            Element *next = next_matrix[i];
+            Transition *next = next_matrix[i];
             // i = next->i
             if(pre->j == i) {
                 value = pre->value * next->value;
@@ -183,7 +183,7 @@ void Decoding::DecodePixelsColors(int level, int x, int y, const Element* &previ
             }
         }
 
-        const Element* result = new Element(res_j, value);
+        const Transition* result = new Transition(res_j, value);
         int quadrant_size = 1 << level; // 2^level
 
         DecodePixelsColors(level-1, x, y, result, this->A);
@@ -198,7 +198,7 @@ void Decoding::DecodePixelsColors(int level, int x, int y, const Element* &previ
     // else
     // Pixels
     double average_color = 0;
-    const Element *pre = previous_matrix;
+    const Transition *pre = previous_matrix;
 
     for (int i = 0; i < this->n; ++i) {
         // i = this->F[i]->i
@@ -211,7 +211,7 @@ void Decoding::DecodePixelsColors(int level, int x, int y, const Element* &previ
     this->pixels_colors[x * this->decoding_image_size + y] = average_color;
 }
 
-void Decoding::free_array_of_elements(Element** &arr, int size) {
+void Decoding::free_array_of_elements(Transition** &arr, int size) {
     for (int i = 0; i < size; ++i) {
         delete arr[i];
         arr[i] = nullptr;

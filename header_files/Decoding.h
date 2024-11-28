@@ -7,7 +7,7 @@
 #include <bits/stdc++.h>
 #include <gtk/gtk.h>
 
-#include "Element.h"
+#include "Transition.h"
 
 using namespace std;
 
@@ -19,8 +19,8 @@ public:
     void Start(char *directory, char *saved_filename);
 
 private:
-    Element **A{}, **B{}, **C{}, **D{}, **F{}, **Inn{}; //Inn is an nxn identity matrix for the first call.
-    const Element *I{};
+    Transition **A{}, **B{}, **C{}, **D{}, **F{}, **Inn{}; //Inn is an nxn identity matrix for the first call.
+    const Transition *I{};
 
     int n{};  // Number of states.
     int depth{}; // Decoding resolution, maximum depth of recursion
@@ -30,8 +30,8 @@ private:
     double *pixels_colors{};
     char *SaveDecodedImage(char *directory, char *filename) const;
     void OpenImage(char *full_path) const;
-    void DecodePixelsColors(int level, int x, int y, const Element* &previous_matrix, Element **next_matrix);
-    void free_array_of_elements(Element** &arr, int size);
+    void DecodePixelsColors(int level, int x, int y, const Transition* &previous_matrix, Transition **next_matrix);
+    void free_array_of_elements(Transition** &arr, int size);
 };
 
 #endif //DECODING_H

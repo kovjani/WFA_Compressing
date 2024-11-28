@@ -3,14 +3,15 @@
 
 #include <iostream>
 #include <string>
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 #include <thread>
+#include <functional>
 #include <gtk/gtk.h>
 #include <glib.h>
 
 #include "Quadrant.h"
-#include "Element.h"
+#include "Transition.h"
 
 using namespace std;
 
@@ -24,8 +25,8 @@ public:
 private:
     GError *error{nullptr};
     GdkPixbuf *pixbuf{};
-    Element **A{}, **B{}, **C{}, **D{};
-    Quadrant **quadtree{}, **states{};
+    Transition **A{}, **B{}, **C{}, **D{};
+    Quadrant **quadtree{}, **states{}, **sorted_states{};
     int width{0};
     int height{0};
     int coding_image_size{0};
@@ -34,10 +35,14 @@ private:
     double EPS{0.0001};
     int calling_counter{0};
     int states_counter{0};
+    int A_counter{0};
+    int B_counter{0};
+    int C_counter{0};
+    int D_counter{0};
 
     Quadrant *CreateQuadtree(int level, int index, int x, int y);
     void CreateWFA();
-    void ScanState(Quadrant &quadrant, char quadrant_symbol, int state_index, int *quadrant_index);
+    void ScanState(Quadrant &quadrant, char quadrant_symbol);
     [[nodiscard]] double CompareQuadrants(const Quadrant &q1, const Quadrant &q2) const;
     void SaveWFA(const char *filename);
 };

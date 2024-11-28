@@ -30,21 +30,22 @@ Coding::Coding(const char *filename, double epsilon) {
     this->quadtree_size = 0;
 
     // In this iteration the maximum value of i is depth-1
-    for (int i = 0; i <= this->depth; ++i) {
+    for (int i = 0; i < this->depth; ++i) {
         this->quadtree_size += pow(4, i);
     }
 
-    g_print("%d\n", this->coding_image_size);
-    g_print("%d\n", this->quadtree_size);
+    /*g_print("%d\n", this->coding_image_size);
+    g_print("%d\n", this->quadtree_size);*/
 
     this->quadtree = new Quadrant*[this->quadtree_size];
     // The maximum number of states is the number of quadtree nodes.
     this->states = new Quadrant *[this->quadtree_size];
+    this->sorted_states = new Quadrant *[this->quadtree_size];
 
-    this->A = new Element *[this->quadtree_size];
-    this->B = new Element *[this->quadtree_size];
-    this->C = new Element *[this->quadtree_size];
-    this->D = new Element *[this->quadtree_size];
+    this->A = new Transition *[this->quadtree_size];
+    this->B = new Transition *[this->quadtree_size];
+    this->C = new Transition *[this->quadtree_size];
+    this->D = new Transition *[this->quadtree_size];
 }
 
 Coding::~Coding() {
@@ -57,9 +58,7 @@ Coding::~Coding() {
     }
 
     for (int i = 0; i < this->states_counter; ++i) {
-        // Elements of states are elements of quadtree aswell, so they have been deleted above.
-        /*delete this->states[i];
-        this->states[i] = nullptr;*/
+        // Elements of states and sorted_states are elements of quadtree aswell, so they have been deleted above.
 
         delete this->A[i];
         this->A[i] = nullptr;
@@ -80,6 +79,9 @@ Coding::~Coding() {
     delete[] this->states;
     this->states = nullptr;
 
+    delete[] this->sorted_states;
+    this->sorted_states = nullptr;
+
     delete[] this->A;
     this->A = nullptr;
 
@@ -96,7 +98,7 @@ Coding::~Coding() {
 void Coding::Start() {
     Quadrant *pic = CreateQuadtree(this->depth, 0, 0, 0);
 
-   // ChildPointers();
+    // ChildPointers();
 
     /*for (int i = 0; i < this->quadtree_size; i++) {
         g_print("%f ", this->quadtree[i]->brightness);
@@ -112,123 +114,131 @@ void Coding::Start() {
 
 void Coding::CreateWFA() {
 
-    // First state represents the whole image.
-    /*if(State::states_counter == 0) {
-        this->states = new State*[1];
-        //Index is 0 by default
-        this->states[0] = new State(this->quadtree[0]);
-    }*/
-
     this->quadtree[0]->index = 0;
+    // this->sorted_states[this->states_counter] = quadtree[0];
     this->states[this->states_counter++] = quadtree[0];
 
     for (int i = 0; i < this->states_counter; ++i) {
 
         Quadrant *scanned_state = this->states[i];
 
-        // ???
-        /*thread t1(&Coding::ScanState, this, scanned_state->a, 'a', i);
-        t1.join();
-        thread t2(&Coding::ScanState, this, scanned_state->b, 'b', i);*/
+        if(scanned_state->a == nullptr) break;
 
-        ScanState(*scanned_state->a, 'a', 0, &i);
-        ScanState(*scanned_state->b, 'b', 0, &i);
-        ScanState(*scanned_state->c, 'c', 0, &i);
-        ScanState(*scanned_state->d, 'd', 0, &i);
+        ScanState(*scanned_state->a, 'a');
+        ScanState(*scanned_state->b, 'b');
+        ScanState(*scanned_state->c, 'c');
+        ScanState(*scanned_state->d, 'd');
+
+        if( i % 100 == 2)
+            g_print("%d\n", this->states_counter);
     }
 }
 
+void Coding::ScanState(Quadrant &quadrant, char quadrant_symbol) {
 
-void Coding::ScanState(Quadrant &quadrant, char quadrant_symbol, int state_index, int *quadrant_index) {
+    for (int i = 0; i < this->states_counter; ++i) {
+         /*this->calling_counter++;
+        if(this->calling_counter % 100000 == 0) {
+            // Process GTK events to keep the UI responsive
+            while (gtk_events_pending())
+                gtk_main_iteration();
+            g_print("%d\n", this->states_counter);
+        }*/
 
-    this->calling_counter++;
-    if(this->calling_counter % 100000 == 0) {
-        // Process GTK events to keep the UI responsive
-        while (gtk_events_pending())
-            gtk_main_iteration();
-        g_print("%d\n", this->states_counter);
-    }
+        // state image vs quadrant
+        //Quadrant *state_image = this->sorted_states[i];
+        Quadrant *state_image = this->states[i];
 
-    // state image vs quadrant
+        // Compare scanned quadrant's children and appropriate grandchildren of a parent.
 
-    Quadrant *state_image = this->states[state_index];
+        double cost = CompareQuadrants(quadrant, *state_image);
+        // If scanned state does not represent the quadrant with any x, but maybe another state.
+        if( cost == -1 ) {
+            continue;
+        }
 
-    // Compare scanned quadrant's children and appropriate grandchildren of a parent.
-    // quadrant vs state_image
-
-    double cost = CompareQuadrants(quadrant, *state_image);
-    if( cost != -1 ) {
+        // If an x cost found, add new transition into the appropriate matrix.
 
         int parent_state_index = quadrant.parent->index;
         int scanned_state_index = state_image->index;
 
-        // If costs are equal add new transition into the appropriate matrix.
-
         switch (quadrant_symbol) {
             case 'a':
-                this->A[parent_state_index] = new Element(parent_state_index, scanned_state_index, cost);
+                this->A[parent_state_index] = new Transition(parent_state_index, scanned_state_index, cost);
             break;
             case 'b':
-                this->B[parent_state_index] = new Element(parent_state_index, scanned_state_index, cost);
+                this->B[parent_state_index] = new Transition(parent_state_index, scanned_state_index, cost);
             break;
             case 'c':
-                this->C[parent_state_index] = new Element(parent_state_index, scanned_state_index, cost);
+                this->C[parent_state_index] = new Transition(parent_state_index, scanned_state_index, cost);
             break;
             case 'd':
-                this->D[parent_state_index] = new Element(parent_state_index, scanned_state_index, cost);
+                this->D[parent_state_index] = new Transition(parent_state_index, scanned_state_index, cost);
             break;
         }
-    } else if(state_index < this->states_counter - 1) {
+        return;     // Do not create new state and not scan other states.
+    }
 
-        // If not, check other states
-        ScanState(quadrant, quadrant_symbol, state_index + 1, quadrant_index);
+    // Create new state
 
-    } else {
-        // Create new state
+    int parent_state_index = quadrant.parent->index;
+    int new_state_index = this->states_counter;
 
-        //*quadrant_index = 0;
+    quadrant.index = new_state_index;
 
-        int parent_state_index = quadrant.parent->index;
-        int new_state_index = this->states_counter;
+    //this->sorted_states[this->states_counter] = &quadrant;
+    this->states[this->states_counter++] = &quadrant;
 
-        quadrant.index = new_state_index;
+    // Sort states by brightness
+    /*for (int i = this->states_counter-1; i > 0; --i) {
+        Quadrant *c;
+        if(this->sorted_states[i-1]->brightness > this->sorted_states[i]->brightness) {
+            c = this->sorted_states[i];
+            this->sorted_states[i] = this->sorted_states[i-1];
+            this->sorted_states[i-1] = c;
+        } else break;
+    }*/
 
-        this->states[this->states_counter++] = &quadrant;
-
-       // this->F.push_back(new Element(quadrant->brightness));
-
-        //Set transition to 1
-        switch (quadrant_symbol) {
-            case 'a':
-                this->A[parent_state_index] = new Element(parent_state_index, new_state_index, 1);
-            break;
-            case 'b':
-                this->B[parent_state_index] = new Element(parent_state_index, new_state_index, 1);
-            break;
-            case 'c':
-                this->C[parent_state_index] = new Element(parent_state_index, new_state_index, 1);
-            break;
-            case 'd':
-                this->D[parent_state_index] = new Element(parent_state_index, new_state_index, 1);
-            break;
-        }
+    //Set transition to 1
+    switch (quadrant_symbol) {
+        case 'a':
+            this->A[parent_state_index] = new Transition(parent_state_index, new_state_index, 1);
+        break;
+        case 'b':
+            this->B[parent_state_index] = new Transition(parent_state_index, new_state_index, 1);
+        break;
+        case 'c':
+            this->C[parent_state_index] = new Transition(parent_state_index, new_state_index, 1);
+        break;
+        case 'd':
+            this->D[parent_state_index] = new Transition(parent_state_index, new_state_index, 1);
+        break;
     }
 }
 
 double Coding::CompareQuadrants(const Quadrant &q1, const Quadrant &q2) const {
+
+    // q1: quadrant
+    // q2: state image
+
+    // If q1 or q2 is a pixel.
+    if(q1.a == nullptr || q2.a == nullptr) {
+        return q1.brightness / q2.brightness;
+    }
+
+    // If brightnesses of quadrants are equals, check children
     double cost_a = q1.a->brightness / q2.a->brightness;
     double cost_b = q1.b->brightness / q2.b->brightness;
     double cost_c = q1.c->brightness / q2.c->brightness;
     double cost_d = q1.d->brightness / q2.d->brightness;
 
-
     // If costs are equal for all nodes according to epsilon, return cost else return -1
-    if( abs(cost_a - cost_b) < this->EPS && abs(cost_a - cost_c) < this->EPS && abs(cost_a - cost_d) < this->EPS  ){
+    if( fabs(cost_a - cost_b) <= this->EPS && fabs(cost_a - cost_c) <= this->EPS && fabs(cost_a - cost_d) <= this->EPS  ){
         return cost_a;
     }
+
     return -1;
 }
-
 
 Quadrant *Coding::CreateQuadtree(int level, int index, int x, int y){
     // Count the average color of the image segment (quadrant) according to parameters.
@@ -251,11 +261,6 @@ Quadrant *Coding::CreateQuadtree(int level, int index, int x, int y){
 
         this->quadtree[index] = new Quadrant(quadrant_average_color);
 
-        if(level == this->depth) {
-            // The parent of root is a pointer to itself.
-            this->quadtree[index]->parent = this->quadtree[index];
-        }
-
         this->quadtree[index]->a = A;
         this->quadtree[index]->b = B;
         this->quadtree[index]->c = C;
@@ -265,29 +270,6 @@ Quadrant *Coding::CreateQuadtree(int level, int index, int x, int y){
         this->quadtree[index]->b->parent = this->quadtree[index];
         this->quadtree[index]->c->parent = this->quadtree[index];
         this->quadtree[index]->d->parent = this->quadtree[index];
-
-        // The children of leaves are pointers to itself.
-        if(level == 1) {
-            this->quadtree[index]->a->a = this->quadtree[index]->a;
-            this->quadtree[index]->a->b = this->quadtree[index]->a;
-            this->quadtree[index]->a->c = this->quadtree[index]->a;
-            this->quadtree[index]->a->d = this->quadtree[index]->a;
-
-            this->quadtree[index]->b->a = this->quadtree[index]->b;
-            this->quadtree[index]->b->b = this->quadtree[index]->b;
-            this->quadtree[index]->b->c = this->quadtree[index]->b;
-            this->quadtree[index]->b->d = this->quadtree[index]->b;
-
-            this->quadtree[index]->c->a = this->quadtree[index]->c;
-            this->quadtree[index]->c->b = this->quadtree[index]->c;
-            this->quadtree[index]->c->c = this->quadtree[index]->c;
-            this->quadtree[index]->c->d = this->quadtree[index]->c;
-
-            this->quadtree[index]->d->a = this->quadtree[index]->d;
-            this->quadtree[index]->d->b = this->quadtree[index]->d;
-            this->quadtree[index]->d->c = this->quadtree[index]->d;
-            this->quadtree[index]->d->d = this->quadtree[index]->d;
-        }
 
         return this->quadtree[index];
     }
@@ -303,7 +285,7 @@ Quadrant *Coding::CreateQuadtree(int level, int index, int x, int y){
     const int b = p[2];
 
     //Do not store pixels as quadrants, just the average color of 4 pixel.
-    return new Quadrant(static_cast<double>(r + g + b) / 3);
+    return new Quadrant((static_cast<double>(r + g + b) / 3) / 255);
 }
 
 void Coding::SaveWFA(const char *filename) {
@@ -316,32 +298,32 @@ void Coding::SaveWFA(const char *filename) {
     fprintf(file, "%d\n\n", this->states_counter);
 
     // F
-    for (size_t i = 0; i < this->states_counter; ++i) {
+    for (int i = 0; i < this->states_counter; ++i) {
         if(i < this->states_counter - 1) {
-            fprintf(file, "%.4g ", this->states[i]->brightness/255);
+            fprintf(file, "%.4g ", this->states[i]->brightness);
         } else {
-            fprintf(file, "%.4g\n", this->states[i]->brightness/255);
+            fprintf(file, "%.4g\n", this->states[i]->brightness);
         }
     }
 
     fprintf(file, "\n");
 
     // A
-    for (size_t i = 0; i < this->states_counter; ++i) {
+    for (int i = 0; i < this->states_counter; ++i) {
         fprintf(file, "%d %.4g\n", this->A[i]->j, this->A[i]->value);
     }
 
     fprintf(file, "\n");
 
     // B
-    for (size_t i = 0; i < this->states_counter; ++i) {
+    for (int i = 0; i < this->states_counter; ++i) {
         fprintf(file, "%d %.4g\n", this->B[i]->j, this->B[i]->value);
     }
 
     fprintf(file, "\n");
 
     // C
-    for (size_t i = 0; i < this->states_counter; ++i) {
+    for (int i = 0; i < this->states_counter; ++i) {
         fprintf(file, "%d %.4g\n", this->C[i]->j, this->C[i]->value);
     }
 

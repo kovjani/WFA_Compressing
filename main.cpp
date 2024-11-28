@@ -6,6 +6,11 @@
 #include "header_files/Coding.h"
 #include "header_files/Decoding.h"
 
+struct CodingArgs {
+    GtkFileChooserButton *file_chooser_button;
+    Coding *code;
+};
+
 void CodingFileChoosed(GtkFileChooserButton *clicked_button, GtkWidget *coding_button) {
     // Make compress button sensitive.
     gtk_widget_set_sensitive(coding_button, TRUE);
@@ -24,15 +29,21 @@ void SwitchToDeCoding(GtkButton *button, GtkStack *stack) {
     gtk_stack_set_visible_child_name(stack, "decoding_page");
 }
 
-void onCodingClicked(GtkWidget *clicked_button, GtkWidget *file_chooser_button) {
-    char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_chooser_button));
-    char *directory = g_path_get_dirname(filename);
+void onCodingClicked(GtkWidget *clicked_button, gpointer user_data) {
+    CodingArgs *data = static_cast<CodingArgs*>(user_data);
 
-    Coding code(filename, 0.01);
-    code.Start();
+    char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(data->file_chooser_button));
+    //char *directory = g_path_get_dirname(filename);
 
-    g_free(filename);
-    g_free(directory);
+    data->code = new Coding(filename, 0.0001);
+    //Coding code(filename, 0.0001);
+    //code.Start();
+
+    thread t1(&Coding::Start, data->code);
+    t1.detach();
+
+    //g_free(filename);
+    //g_free(directory);
 }
 
 void onDecodingClicked(GtkWidget *clicked_button, GtkWidget *file_chooser_button) {
@@ -50,6 +61,8 @@ int main(int argc, char *argv[]) {
     /*Testing test(1,9);
     test.Start();
     */
+    Coding code;
+
     gtk_init(&argc, &argv);
 
     // Load the Glade file.
@@ -82,7 +95,9 @@ int main(int argc, char *argv[]) {
     g_signal_connect(coding_file_chooser_button, "file-set", G_CALLBACK(CodingFileChoosed), coding_button);
     g_signal_connect(decoding_file_chooser_button, "file-set", G_CALLBACK(DecodingFileChoosed), decoding_button);
 
-    g_signal_connect(coding_button, "clicked", G_CALLBACK(onCodingClicked), coding_file_chooser_button);
+    CodingArgs coding_args = {coding_file_chooser_button, &code};
+
+    g_signal_connect(coding_button, "clicked", G_CALLBACK(onCodingClicked), &coding_args);
     g_signal_connect(decoding_button, "clicked", G_CALLBACK(onDecodingClicked), decoding_file_chooser_button);
 
     g_signal_connect(coding_page_button, "clicked", G_CALLBACK(SwitchToCoding), stack);
