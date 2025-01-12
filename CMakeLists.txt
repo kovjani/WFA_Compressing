@@ -12,10 +12,12 @@ include_directories(${GTK_INCLUDE_DIRS})
 link_directories(${GTK_LIBRARY_DIRS})
 
 add_executable(WFA main.cpp
-        source_files/Decoding.cpp
-        header_files/Decoding.h
-        source_files/Coding.cpp
-        header_files/Coding.h
+        source_files/DeterministicDecoding.cpp
+        header_files/DeterministicDecoding.h
+        source_files/DeterministicCoding.cpp
+        header_files/DeterministicCoding.h
+        source_files/NondeterministicDecoding.cpp
+        header_files/NondeterministicDecoding.h
         source_files/Quadrant.cpp
         header_files/Quadrant.h
         source_files/Transition.cpp

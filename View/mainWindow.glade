@@ -18,197 +18,237 @@
     <property name="width-request">500</property>
     <property name="can-focus">False</property>
     <property name="border-width">25</property>
-    <property name="title" translatable="yes">WFA</property>
+    <property name="title" translatable="yes">Súlyozott véges automata</property>
     <child>
-      <object class="GtkStack" id="stack">
+      <object class="GtkBox">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
         <child>
-          <object class="GtkBox" id="coding_page">
+          <!-- n-columns=3 n-rows=1 -->
+          <object class="GtkGrid">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="orientation">vertical</property>
-            <property name="spacing">50</property>
+            <property name="column-homogeneous">True</property>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkButton" id="deterministic_coding_page_button">
+                <property name="label" translatable="yes">Determinisztikus Kódolás</property>
                 <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label" translatable="yes">WFA Kódolás</property>
-                <attributes>
-                  <attribute name="foreground" value="#9a9a99999696"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <!-- n-columns=2 n-rows=1 -->
-              <object class="GtkGrid">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="column-homogeneous">True</property>
-                <child>
-                  <object class="GtkButton">
-                    <property name="label" translatable="yes">Kódolás</property>
-                    <property name="visible">True</property>
-                    <property name="sensitive">False</property>
-                    <property name="can-focus">True</property>
-                    <property name="receives-default">True</property>
-                  </object>
-                  <packing>
-                    <property name="left-attach">0</property>
-                    <property name="top-attach">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkButton" id="decoding_page_button">
-                    <property name="label" translatable="yes">Dekódolás</property>
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="receives-default">True</property>
-                  </object>
-                  <packing>
-                    <property name="left-attach">1</property>
-                    <property name="top-attach">0</property>
-                  </packing>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkFileChooserButton" id="coding_file_chooser_button">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="filter">ImageFiles</property>
-                <property name="title" translatable="yes"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">3</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="coding_button">
-                <property name="label" translatable="yes">Kódolás</property>
-                <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
-                <property name="halign">center</property>
               </object>
               <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">4</property>
+                <property name="left-attach">0</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="deterministic_decoding_page_button">
+                <property name="label" translatable="yes">Determinisztikus Dekódolás</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+              </object>
+              <packing>
+                <property name="left-attach">1</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="nondeterministic_decoding_page_button">
+                <property name="label" translatable="yes">Nemdeterminisztikus Dekódolás</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+              </object>
+              <packing>
+                <property name="left-attach">2</property>
+                <property name="top-attach">0</property>
               </packing>
             </child>
           </object>
           <packing>
-            <property name="name">coding_page</property>
-            <property name="title" translatable="yes">WFA Kódolás</property>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
           </packing>
         </child>
         <child>
-          <object class="GtkBox" id="decoding_page">
+          <object class="GtkStack" id="stack">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="orientation">vertical</property>
-            <property name="spacing">50</property>
+            <property name="margin-top">50</property>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkBox" id="deterministic_coding_page">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label" translatable="yes">WFA Dekódolás</property>
-                <attributes>
-                  <attribute name="foreground" value="#9a9a99999696"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <!-- n-columns=2 n-rows=1 -->
-              <object class="GtkGrid">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="column-homogeneous">True</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">50</property>
                 <child>
-                  <object class="GtkButton" id="coding_page_button">
-                    <property name="label" translatable="yes">Kódolás</property>
+                  <object class="GtkLabel">
                     <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="receives-default">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Determinisztikus Kódolás</property>
+                    <attributes>
+                      <attribute name="foreground" value="#9a9a99999696"/>
+                    </attributes>
                   </object>
                   <packing>
-                    <property name="left-attach">0</property>
-                    <property name="top-attach">0</property>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton">
+                  <object class="GtkFileChooserButton" id="deterministic_coding_file_chooser_button">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="filter">ImageFiles</property>
+                    <property name="title" translatable="yes"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="deterministic_coding_button">
+                    <property name="label" translatable="yes">Kódolás</property>
+                    <property name="visible">True</property>
+                    <property name="sensitive">False</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
+                    <property name="halign">center</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">4</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="name">deterministic_coding_page</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox" id="deterministic_decoding_page">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">50</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Determinisztikus Dekódolás</property>
+                    <attributes>
+                      <attribute name="foreground" value="#9a9a99999696"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkFileChooserButton" id="deterministic_decoding_file_chooser_button">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="filter">WFAFiles</property>
+                    <property name="title" translatable="yes"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="deterministic_decoding_button">
                     <property name="label" translatable="yes">Dekódolás</property>
                     <property name="visible">True</property>
                     <property name="sensitive">False</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
                   </object>
                   <packing>
-                    <property name="left-attach">1</property>
-                    <property name="top-attach">0</property>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">4</property>
                   </packing>
                 </child>
               </object>
               <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
+                <property name="name">deterministic_decoding_page</property>
                 <property name="position">1</property>
               </packing>
             </child>
             <child>
-              <object class="GtkFileChooserButton" id="decoding_file_chooser_button">
+              <object class="GtkBox" id="nondeterministic_decoding_page">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="filter">WFAFiles</property>
-                <property name="title" translatable="yes"/>
+                <property name="orientation">vertical</property>
+                <property name="spacing">50</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Nemdeterminisztikus Dekódolás</property>
+                    <attributes>
+                      <attribute name="foreground" value="#9a9a99999696"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkFileChooserButton" id="nondeterministic_decoding_file_chooser_button">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="filter">WFAFiles</property>
+                    <property name="title" translatable="yes"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="nondeterministic_decoding_button">
+                    <property name="label" translatable="yes">Dekódolás</property>
+                    <property name="visible">True</property>
+                    <property name="sensitive">False</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">4</property>
+                  </packing>
+                </child>
               </object>
               <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">3</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="decoding_button">
-                <property name="label" translatable="yes">Dekódolás</property>
-                <property name="visible">True</property>
-                <property name="sensitive">False</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <property name="halign">center</property>
-                <property name="valign">center</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">4</property>
+                <property name="name">nondeterministic_decoding_page</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </object>
           <packing>
-            <property name="name">decoding_page</property>
-            <property name="title" translatable="yes">WFA Dekódolás</property>
-            <property name="position">1</property>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>

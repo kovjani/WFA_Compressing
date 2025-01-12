@@ -1,28 +1,18 @@
-#include "../header_files/Decoding.h"
+#include "../header_files/DeterministicDecoding.h"
 
 #include "../header_files/Transition.h"
 
-Decoding::Decoding(char *filename, int depth, double intensity) {
+DeterministicDecoding::DeterministicDecoding(char *filename, int depth, double intensity) {
     this->depth = depth;
     this->decoding_image_size = 1 << depth; // The size of the image (2^res)
 
     this->pixels_colors = (double *)malloc(this->decoding_image_size*this->decoding_image_size*sizeof(double));
 
     // Open a file in read mode
-    // FILE *wfa_file = fopen(filename, "r");
 
     string line, token;
 
     ifstream wfa_file(filename);
-
-    // Check if the file was opened successfully
-    /* if (wfa_file == NULL) {
-         g_print("Failed to open the file.\n");
-         return;
-     }*/
-
-    // char line[10000000];
-    // std::vector<char> line;
 
     // The first line is the size of the square matrices
     getline(wfa_file, line);
@@ -71,8 +61,11 @@ Decoding::Decoding(char *filename, int depth, double intensity) {
         getline(line_stream, token, ' ');
         int j= stoi(token);
 
-        getline(line_stream, token, ' ');
-        double value = stod(token);
+        // If there is no cost in a line, the cost is 1 by default.
+        double value = 1;
+        if(getline(line_stream, token, ' ')) {
+            value = stod(token);
+        }
 
         this->A[i] = new Transition(j, value);
     }
@@ -88,8 +81,11 @@ Decoding::Decoding(char *filename, int depth, double intensity) {
         getline(line_stream, token, ' ');
         int j= stoi(token);
 
-        getline(line_stream, token, ' ');
-        double value = stod(token);
+        // If there is no cost in a line, the cost is 1 by default.
+        double value = 1;
+        if(getline(line_stream, token, ' ')) {
+            value = stod(token);
+        }
 
         this->B[i] = new Transition(j, value);
     }
@@ -105,8 +101,11 @@ Decoding::Decoding(char *filename, int depth, double intensity) {
         getline(line_stream, token, ' ');
         int j= stoi(token);
 
-        getline(line_stream, token, ' ');
-        double value = stod(token);
+        // If there is no cost in a line, the cost is 1 by default.
+        double value = 1;
+        if(getline(line_stream, token, ' ')) {
+            value = stod(token);
+        }
 
         this->C[i] = new Transition(j, value);
     }
@@ -122,14 +121,17 @@ Decoding::Decoding(char *filename, int depth, double intensity) {
         getline(line_stream, token, ' ');
         int j= stoi(token);
 
-        getline(line_stream, token, ' ');
-        double value = stod(token);
+        // If there is no cost in a line, the cost is 1 by default.
+        double value = 1;
+        if(getline(line_stream, token, ' ')) {
+            value = stod(token);
+        }
 
         this->D[i] = new Transition(j, value);
     }
 }
 
-Decoding::~Decoding() {
+DeterministicDecoding::~DeterministicDecoding() {
     // Free the allocated memory
 
     free_array_of_elements(this->A, this->n);
@@ -144,18 +146,24 @@ Decoding::~Decoding() {
     delete this->pixels_colors;
 }
 
-void Decoding::Start(char *directory, char *saved_filename) {
+void DeterministicDecoding::free_array_of_elements(Transition** &arr, int size) {
+    for (int i = 0; i < size; ++i) {
+        delete arr[i];
+        arr[i] = nullptr;
+    }
+    delete[] arr;
+}
+
+void DeterministicDecoding::Start(char *directory, char *saved_filename) {
     DecodePixelsColors(this->depth, 0, 0, this->I, this->Inn);
     char *saved_file_path = SaveDecodedImage(directory, saved_filename);
 
-    if(!this->testing) {
-        OpenImage(saved_file_path);
-    }
+    OpenImage(saved_file_path);
 
     g_free(saved_file_path);
 }
 
-void Decoding::DecodePixelsColors(int level, int x, int y, const Transition* &previous_matrix, Transition **next_matrix) {
+void DeterministicDecoding::DecodePixelsColors(int level, int x, int y, const Transition* &previous_matrix, Transition **next_matrix) {
 
     // Process GTK events to keep the UI responsive
     this->calling_counter++;
@@ -211,15 +219,7 @@ void Decoding::DecodePixelsColors(int level, int x, int y, const Transition* &pr
     this->pixels_colors[x * this->decoding_image_size + y] = average_color;
 }
 
-void Decoding::free_array_of_elements(Transition** &arr, int size) {
-    for (int i = 0; i < size; ++i) {
-        delete arr[i];
-        arr[i] = nullptr;
-    }
-    delete[] arr;
-}
-
-void Decoding::OpenImage(char *full_path) const{
+void DeterministicDecoding::OpenImage(char *full_path) const{
     
     GtkWidget *window;
     GtkWidget *image;
@@ -246,7 +246,7 @@ void Decoding::OpenImage(char *full_path) const{
     gtk_main();
 }
 
-char *Decoding::SaveDecodedImage(char *directory, char *filename) const {
+char *DeterministicDecoding::SaveDecodedImage(char *directory, char *filename) const {
 
     GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, this->decoding_image_size, this->decoding_image_size);
     guchar *pixels = gdk_pixbuf_get_pixels(pixbuf);

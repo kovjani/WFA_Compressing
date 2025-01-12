@@ -15,7 +15,6 @@ Transition::Transition(int i, int j, double value) {
     this->value = value;
 }
 
-// Sort elements by i.
 /*bool Transition::operator< (const Transition &other) const {
     return this->i < other.i;
 }*/

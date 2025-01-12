@@ -1,27 +1,19 @@
-#include "../header_files/Coding.h"
+#include "../header_files/DeterministicCoding.h"
 
-Coding::Coding(const char *filename, double epsilon) {
+DeterministicCoding::DeterministicCoding(const char *filename, double epsilon) {
     this->EPS = epsilon;
 
-    //Open the image and split it into pieces.
+    // Open the image and split it into pieces, than store it in a quadtree.
+    // It helps to create the automaton.
 
     // Open image
     this->pixbuf = gdk_pixbuf_new_from_file(filename, &this->error);
-    /*if (!pixbuf) {
-        g_print(stderr, "Error loading image: %s\n", error->message);
-        g_error_free(error);
-        return;
-    }*/
 
     // Compare pixel colors and create automata.
 
     this->width = gdk_pixbuf_get_width(this->pixbuf);
     this->height = gdk_pixbuf_get_height(this->pixbuf);
     this->coding_image_size = this->width > this->height ? this->height : this->width;
-
-    /*AverageCounter(pixbuf, &full_image);
-
-    g_print("%d, %d, %d, %f, %f, %f\n", full_image.x, full_image.y, full_image.size, full_image.color[0], full_image.color[1], full_image.color[2]);*/
 
     // A full quadtree for a (2^level*2^level) image has ((4^level - 1) / 3) nodes.
     // The number of leaves in a full quadtree is (4^level).
@@ -34,10 +26,8 @@ Coding::Coding(const char *filename, double epsilon) {
         this->quadtree_size += pow(4, i);
     }
 
-    /*g_print("%d\n", this->coding_image_size);
-    g_print("%d\n", this->quadtree_size);*/
-
     this->quadtree = new Quadrant*[this->quadtree_size];
+
     // The maximum number of states is the number of quadtree nodes.
     this->states = new Quadrant *[this->quadtree_size];
     this->sorted_states = new Quadrant *[this->quadtree_size];
@@ -48,8 +38,9 @@ Coding::Coding(const char *filename, double epsilon) {
     this->D = new Transition *[this->quadtree_size];
 }
 
-Coding::~Coding() {
+DeterministicCoding::~DeterministicCoding() {
     // Free the allocated memory.
+
     g_object_unref(this->pixbuf);
 
     for (int i = 0; i < this->quadtree_size; ++i) {
@@ -95,27 +86,19 @@ Coding::~Coding() {
     this->D = nullptr;
 }
 
-void Coding::Start() {
-    Quadrant *pic = CreateQuadtree(this->depth, 0, 0, 0);
+void DeterministicCoding::Start() {
 
-    // ChildPointers();
-
-    /*for (int i = 0; i < this->quadtree_size; i++) {
-        g_print("%f ", this->quadtree[i]->brightness);
-    }*/
+    CreateQuadtree(this->depth, 0, 0, 0);
 
     CreateWFA();
 
     SaveWFA("/home/jani/wfa.wfa");
 
-    //delete pic;
-    //pic = nullptr;
 }
 
-void Coding::CreateWFA() {
+void DeterministicCoding::CreateWFA() {
 
     this->quadtree[0]->index = 0;
-    // this->sorted_states[this->states_counter] = quadtree[0];
     this->states[this->states_counter++] = quadtree[0];
 
     for (int i = 0; i < this->states_counter; ++i) {
@@ -129,12 +112,12 @@ void Coding::CreateWFA() {
         ScanState(*scanned_state->c, 'c');
         ScanState(*scanned_state->d, 'd');
 
-        if( i % 100 == 2)
+       // if( i % 100 == 2)
             g_print("%d\n", this->states_counter);
     }
 }
 
-void Coding::ScanState(Quadrant &quadrant, char quadrant_symbol) {
+void DeterministicCoding::ScanState(Quadrant &quadrant, char quadrant_symbol) {
 
     for (int i = 0; i < this->states_counter; ++i) {
          /*this->calling_counter++;
@@ -146,12 +129,11 @@ void Coding::ScanState(Quadrant &quadrant, char quadrant_symbol) {
         }*/
 
         // state image vs quadrant
-        //Quadrant *state_image = this->sorted_states[i];
         Quadrant *state_image = this->states[i];
 
         // Compare scanned quadrant's children and appropriate grandchildren of a parent.
-
         double cost = CompareQuadrants(quadrant, *state_image);
+
         // If scanned state does not represent the quadrant with any x, but maybe another state.
         if( cost == -1 ) {
             continue;
@@ -186,18 +168,7 @@ void Coding::ScanState(Quadrant &quadrant, char quadrant_symbol) {
 
     quadrant.index = new_state_index;
 
-    //this->sorted_states[this->states_counter] = &quadrant;
     this->states[this->states_counter++] = &quadrant;
-
-    // Sort states by brightness
-    /*for (int i = this->states_counter-1; i > 0; --i) {
-        Quadrant *c;
-        if(this->sorted_states[i-1]->brightness > this->sorted_states[i]->brightness) {
-            c = this->sorted_states[i];
-            this->sorted_states[i] = this->sorted_states[i-1];
-            this->sorted_states[i-1] = c;
-        } else break;
-    }*/
 
     //Set transition to 1
     switch (quadrant_symbol) {
@@ -216,7 +187,7 @@ void Coding::ScanState(Quadrant &quadrant, char quadrant_symbol) {
     }
 }
 
-double Coding::CompareQuadrants(const Quadrant &q1, const Quadrant &q2) const {
+double DeterministicCoding::CompareQuadrants(const Quadrant &q1, const Quadrant &q2) const {
 
     // q1: quadrant
     // q2: state image
@@ -240,7 +211,7 @@ double Coding::CompareQuadrants(const Quadrant &q1, const Quadrant &q2) const {
     return -1;
 }
 
-Quadrant *Coding::CreateQuadtree(int level, int index, int x, int y){
+Quadrant *DeterministicCoding::CreateQuadtree(int level, int index, int x, int y){
     // Count the average color of the image segment (quadrant) according to parameters.
 
     if(level > 0) {
@@ -288,51 +259,156 @@ Quadrant *Coding::CreateQuadtree(int level, int index, int x, int y){
     return new Quadrant((static_cast<double>(r + g + b) / 3) / 255);
 }
 
-void Coding::SaveWFA(const char *filename) {
-    FILE *file = fopen(filename, "w");
-    if (file == nullptr) {
-        perror("Failed to open file");
+void DeterministicCoding::SaveWFA(const char *filename) {
+    ofstream file(filename);
+    if(! file.is_open()) {
+        g_printerr("error file opening");
         return;
     }
 
-    fprintf(file, "%d\n\n", this->states_counter);
+    file << this->states_counter << endl << endl;
 
     // F
     for (int i = 0; i < this->states_counter; ++i) {
-        if(i < this->states_counter - 1) {
-            fprintf(file, "%.4g ", this->states[i]->brightness);
+        // Round value to 4 decimals
+        ostringstream oss;
+        oss << fixed << setprecision(4) << this->states[i]->brightness;
+        std::string brightness = oss.str();
+
+        // Remove trailing zeros
+        brightness.erase(brightness.find_last_not_of('0') + 1, std::string::npos);
+        if (brightness.back() == '.') {
+            brightness.pop_back();
+        }
+
+        if( i < this->states_counter - 1 ) {
+            file << brightness << " ";
         } else {
-            fprintf(file, "%.4g\n", this->states[i]->brightness);
+            file << brightness << endl << endl;
         }
     }
 
-    fprintf(file, "\n");
-
     // A
     for (int i = 0; i < this->states_counter; ++i) {
-        fprintf(file, "%d %.4g\n", this->A[i]->j, this->A[i]->value);
-    }
+        // If the cost is 1, don't store it, only j. state enough, because there might be a lot of 1 cost in the automata.
+        // So if there is no cost in a line, the decoding algorithm uses 1.
+        if(this->A[i]->value == 1) {
+            if( i < this->states_counter - 1 ) {
+                file << this->A[i]->j << endl;
+            } else {
+                file << this->A[i]->j << endl << endl;
+            }
+            continue;
+        }
 
-    fprintf(file, "\n");
+        // Round value to 4 decimals
+        ostringstream oss;
+        oss << fixed << setprecision(4) << this->A[i]->value;
+        std::string brightness = oss.str();
+
+        // Remove trailing zeros
+        brightness.erase(brightness.find_last_not_of('0') + 1, std::string::npos);
+        if (brightness.back() == '.') {
+            brightness.pop_back();
+        }
+
+        if( i < this->states_counter - 1 ) {
+            file << this->A[i]->j << " " << brightness << endl;
+        } else {
+            file << this->A[i]->j << " " << brightness << endl << endl;
+        }
+    }
 
     // B
     for (int i = 0; i < this->states_counter; ++i) {
-        fprintf(file, "%d %.4g\n", this->B[i]->j, this->B[i]->value);
-    }
+        // If the cost is 1, don't store it, only j. state enough, because there might be a lot of 1 cost in the automata.
+        // So if there is no cost in a line, the decoding algorithm uses 1.
+        if(this->B[i]->value == 1) {
+            if( i < this->states_counter - 1 ) {
+                file << this->B[i]->j << endl;
+            } else {
+                file << this->B[i]->j << endl << endl;
+            }
+            continue;
+        }
 
-    fprintf(file, "\n");
+        // Round value to 4 decimals
+        ostringstream oss;
+        oss << fixed << setprecision(4) << this->B[i]->value;
+        std::string brightness = oss.str();
+
+        // Remove trailing zeros
+        brightness.erase(brightness.find_last_not_of('0') + 1, std::string::npos);
+        if (brightness.back() == '.') {
+            brightness.pop_back();
+        }
+
+        if( i < this->states_counter - 1 ) {
+            file << this->B[i]->j << " " << brightness << endl;
+        } else {
+            file << this->B[i]->j << " " << brightness << endl << endl;
+        }
+    }
 
     // C
     for (int i = 0; i < this->states_counter; ++i) {
-        fprintf(file, "%d %.4g\n", this->C[i]->j, this->C[i]->value);
-    }
+        // If the cost is 1, don't store it, only j. state enough, because there might be a lot of 1 cost in the automata.
+        // So if there is no cost in a line, the decoding algorithm uses 1.
+        if(this->C[i]->value == 1) {
+            if( i < this->states_counter - 1 ) {
+                file << this->C[i]->j << endl;
+            } else {
+                file << this->C[i]->j << endl << endl;
+            }
+            continue;
+        }
 
-    fprintf(file, "\n");
+        // Round value to 4 decimals
+        ostringstream oss;
+        oss << fixed << setprecision(4) << this->C[i]->value;
+        std::string brightness = oss.str();
+
+        // Remove trailing zeros
+        brightness.erase(brightness.find_last_not_of('0') + 1, std::string::npos);
+        if (brightness.back() == '.') {
+            brightness.pop_back();
+        }
+
+        if( i < this->states_counter - 1 ) {
+            file << this->C[i]->j << " " << brightness << endl;
+        } else {
+            file << this->C[i]->j << " " << brightness << endl << endl;
+        }
+    }
 
     // D
-    for (size_t i = 0; i < this->states_counter; ++i) {
-        fprintf(file, "%d %.4g\n", this->D[i]->j, this->D[i]->value);
-    }
+    for (int i = 0; i < this->states_counter; ++i) {
+        // If the cost is 1, don't store it, only j. state enough, because there might be a lot of 1 cost in the automata.
+        // So if there is no cost in a line, the decoding algorithm uses 1.
+        if(this->D[i]->value == 1) {
+            if( i < this->states_counter - 1 ) {
+                file << this->D[i]->j << endl;
+            } else {
+                file << this->D[i]->j << endl << endl;
+            }
+            continue;
+        }
 
-    fclose(file);
+        // Round value to 4 decimals
+        ostringstream oss;
+        oss << fixed << setprecision(4) << this->D[i]->value;
+        std::string brightness = oss.str();
+
+        // Remove trailing zeros
+        brightness.erase(brightness.find_last_not_of('0') + 1, std::string::npos);
+        if (brightness.back() == '.') {
+            brightness.pop_back();
+        }
+
+        if( i < this->states_counter - 1 ) {
+            file << this->D[i]->j << " " << brightness << endl;
+        } else {
+            file << this->D[i]->j << " " << brightness << endl << endl;
+        }
+    }
 }

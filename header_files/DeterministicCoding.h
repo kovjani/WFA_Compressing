@@ -1,7 +1,9 @@
-#ifndef CODING_H
-#define CODING_H
+#ifndef DETERMINISTICCODING_H
+#define DETERMINISTICCODING_H
 
 #include <iostream>
+#include <fstream>
+#include <iomanip>
 #include <string>
 #include <cmath>
 #include <algorithm>
@@ -15,11 +17,11 @@
 
 using namespace std;
 
-class Coding {
+class DeterministicCoding {
 public:
-    Coding() = default;
-    explicit Coding(const char *filename, double epsilon);
-    ~Coding();
+    DeterministicCoding() = default;
+    explicit DeterministicCoding(const char *filename, double epsilon);
+    ~DeterministicCoding();
     void Start();
 
 private:
@@ -33,12 +35,8 @@ private:
     int depth{0};
     int quadtree_size{0}; // Quadtree size
     double EPS{0.0001};
-    int calling_counter{0};
     int states_counter{0};
-    int A_counter{0};
-    int B_counter{0};
-    int C_counter{0};
-    int D_counter{0};
+    // int calling_counter{0};
 
     Quadrant *CreateQuadtree(int level, int index, int x, int y);
     void CreateWFA();
@@ -47,4 +45,4 @@ private:
     void SaveWFA(const char *filename);
 };
 
-#endif //CODING_H
+#endif //DETERMINISTICCODING_H

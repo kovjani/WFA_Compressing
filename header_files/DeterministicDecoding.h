@@ -1,8 +1,10 @@
-#ifndef DECODING_H
-#define DECODING_H
+#ifndef DETERMINISTICDECODING_H
+#define DETERMINISTICDECODING_H
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <vector>
 #include <string>
 #include <bits/stdc++.h>
 #include <gtk/gtk.h>
@@ -11,11 +13,11 @@
 
 using namespace std;
 
-class Decoding {
+class DeterministicDecoding {
 public:
-    Decoding() = default;
-    Decoding(char *filename, int depth, double intensity);
-    ~Decoding();
+    DeterministicDecoding() = default;
+    DeterministicDecoding(char *filename, int depth, double intensity);
+    ~DeterministicDecoding();
     void Start(char *directory, char *saved_filename);
 
 private:
@@ -25,7 +27,6 @@ private:
     int n{};  // Number of states.
     int depth{}; // Decoding resolution, maximum depth of recursion
     int decoding_image_size{}; // The size of the image (2^res)
-    bool testing{false};
     int calling_counter{0};
     double *pixels_colors{};
     char *SaveDecodedImage(char *directory, char *filename) const;
@@ -34,4 +35,4 @@ private:
     void free_array_of_elements(Transition** &arr, int size);
 };
 
-#endif //DECODING_H
+#endif //DETERMINISTICDECODING_H

@@ -1,4 +1,4 @@
-# Install script for directory: /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing
+# Install script for directory: /home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_Compressing
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_compressing/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/jani/Documents/Egyetem/PTI_BSc/Szakdoga/WFA_Compressing/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

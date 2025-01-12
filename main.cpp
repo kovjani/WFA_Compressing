@@ -3,54 +3,75 @@
 #include <gtk/gtk.h>
 #include <glib.h>
 #include <math.h>
-#include "header_files/Coding.h"
-#include "header_files/Decoding.h"
+#include "header_files/DeterministicCoding.h"
+#include "header_files/DeterministicDecoding.h"
+#include "header_files/NondeterministicDecoding.h"
 
 struct CodingArgs {
     GtkFileChooserButton *file_chooser_button;
-    Coding *code;
+    DeterministicCoding *code;
 };
 
-void CodingFileChoosed(GtkFileChooserButton *clicked_button, GtkWidget *coding_button) {
-    // Make compress button sensitive.
+void DeterministicCodingFileChoosed(GtkFileChooserButton *clicked_button, GtkWidget *coding_button) {
+    // Make coding button sensitive.
     gtk_widget_set_sensitive(coding_button, TRUE);
 }
 
-void DecodingFileChoosed(GtkFileChooserButton *clicked_button, GtkWidget *decoding_button) {
-    // Make compress button sensitive.
+void DeterministicDecodingFileChoosed(GtkFileChooserButton *clicked_button, GtkWidget *decoding_button) {
+    // Make decoding button sensitive.
     gtk_widget_set_sensitive(decoding_button, TRUE);
 }
 
-void SwitchToCoding(GtkButton *button, GtkStack *stack) {
-    gtk_stack_set_visible_child_name(stack, "coding_page");
+void NondeterministicDecodingFileChoosed(GtkFileChooserButton *clicked_button, GtkWidget *decoding_button) {
+    // Make decoding button sensitive.
+    gtk_widget_set_sensitive(decoding_button, TRUE);
 }
 
-void SwitchToDeCoding(GtkButton *button, GtkStack *stack) {
-    gtk_stack_set_visible_child_name(stack, "decoding_page");
+void SwitchToDeterministicCoding(GtkButton *button, GtkStack *stack) {
+    gtk_stack_set_visible_child_name(stack, "deterministic_coding_page");
 }
 
-void onCodingClicked(GtkWidget *clicked_button, gpointer user_data) {
+void SwitchToDeterministicDeCoding(GtkButton *button, GtkStack *stack) {
+    gtk_stack_set_visible_child_name(stack, "deterministic_decoding_page");
+}
+
+void SwitchToNondeterministicDeCoding(GtkButton *button, GtkStack *stack) {
+    gtk_stack_set_visible_child_name(stack, "nondeterministic_decoding_page");
+}
+
+void onDeterministicCodingClicked(GtkWidget *clicked_button, gpointer user_data) {
     CodingArgs *data = static_cast<CodingArgs*>(user_data);
 
     char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(data->file_chooser_button));
     //char *directory = g_path_get_dirname(filename);
 
-    data->code = new Coding(filename, 0.0001);
+    data->code = new DeterministicCoding(filename, 0.0001);
     //Coding code(filename, 0.0001);
     //code.Start();
 
-    thread t1(&Coding::Start, data->code);
+    thread t1(&DeterministicCoding::Start, data->code);
     t1.detach();
 
     //g_free(filename);
     //g_free(directory);
 }
 
-void onDecodingClicked(GtkWidget *clicked_button, GtkWidget *file_chooser_button) {
+void onDeterministicDecodingClicked(GtkWidget *clicked_button, GtkWidget *file_chooser_button) {
     char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_chooser_button));
     char *directory = g_path_get_dirname(filename);
 
-    Decoding decode(filename, 9, 1);
+    DeterministicDecoding decode(filename, 9, 1);
+    decode.Start(directory, "wfa_image.png");
+
+    g_free(filename);
+    g_free(directory);
+}
+
+void onNondeterministicDecodingClicked(GtkWidget *clicked_button, GtkWidget *file_chooser_button) {
+    char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_chooser_button));
+    char *directory = g_path_get_dirname(filename);
+
+    NondeterministicDecoding decode(filename, 9, 1);
     decode.Start(directory, "wfa_image.png");
 
     g_free(filename);
@@ -58,10 +79,8 @@ void onDecodingClicked(GtkWidget *clicked_button, GtkWidget *file_chooser_button
 }
 
 int main(int argc, char *argv[]) {
-    /*Testing test(1,9);
-    test.Start();
-    */
-    Coding code;
+
+    DeterministicCoding code;
 
     gtk_init(&argc, &argv);
 
@@ -82,26 +101,32 @@ int main(int argc, char *argv[]) {
     // Get widgets pointer from the Glade file.
     GtkStack *stack = GTK_STACK(gtk_builder_get_object(builder, "stack"));
 
-    GtkButton *coding_page_button = GTK_BUTTON(gtk_builder_get_object(builder, "coding_page_button"));
-    GtkButton *decoding_page_button = GTK_BUTTON(gtk_builder_get_object(builder, "decoding_page_button"));
+    GtkButton *deterministic_coding_page_button = GTK_BUTTON(gtk_builder_get_object(builder, "deterministic_coding_page_button"));
+    GtkButton *deterministic_decoding_page_button = GTK_BUTTON(gtk_builder_get_object(builder, "deterministic_decoding_page_button"));
+    GtkButton *nondeterministic_decoding_page_button = GTK_BUTTON(gtk_builder_get_object(builder, "nondeterministic_decoding_page_button"));
 
-    GtkFileChooserButton *coding_file_chooser_button = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder, "coding_file_chooser_button"));
-    GtkFileChooserButton *decoding_file_chooser_button = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder, "decoding_file_chooser_button"));
+    GtkFileChooserButton *deterministic_coding_file_chooser_button = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder, "deterministic_coding_file_chooser_button"));
+    GtkFileChooserButton *deterministic_decoding_file_chooser_button = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder, "deterministic_decoding_file_chooser_button"));
+    GtkFileChooserButton *nondeterministic_decoding_file_chooser_button = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder, "nondeterministic_decoding_file_chooser_button"));
 
-    GtkWidget *coding_button = GTK_WIDGET(gtk_builder_get_object(builder, "coding_button"));
-    GtkWidget *decoding_button = GTK_WIDGET(gtk_builder_get_object(builder, "decoding_button"));
+    GtkWidget *deterministic_coding_button = GTK_WIDGET(gtk_builder_get_object(builder, "deterministic_coding_button"));
+    GtkWidget *deterministic_decoding_button = GTK_WIDGET(gtk_builder_get_object(builder, "deterministic_decoding_button"));
+    GtkWidget *nondeterministic_decoding_button = GTK_WIDGET(gtk_builder_get_object(builder, "nondeterministic_decoding_button"));
 
     // Function calling
-    g_signal_connect(coding_file_chooser_button, "file-set", G_CALLBACK(CodingFileChoosed), coding_button);
-    g_signal_connect(decoding_file_chooser_button, "file-set", G_CALLBACK(DecodingFileChoosed), decoding_button);
+    g_signal_connect(deterministic_coding_file_chooser_button, "file-set", G_CALLBACK(DeterministicCodingFileChoosed), deterministic_coding_button);
+    g_signal_connect(deterministic_decoding_file_chooser_button, "file-set", G_CALLBACK(DeterministicDecodingFileChoosed), deterministic_decoding_button);
+    g_signal_connect(nondeterministic_decoding_file_chooser_button, "file-set", G_CALLBACK(NondeterministicDecodingFileChoosed), nondeterministic_decoding_button);
 
-    CodingArgs coding_args = {coding_file_chooser_button, &code};
+    CodingArgs coding_args = {deterministic_coding_file_chooser_button, &code};
 
-    g_signal_connect(coding_button, "clicked", G_CALLBACK(onCodingClicked), &coding_args);
-    g_signal_connect(decoding_button, "clicked", G_CALLBACK(onDecodingClicked), decoding_file_chooser_button);
+    g_signal_connect(deterministic_coding_button, "clicked", G_CALLBACK(onDeterministicCodingClicked), &coding_args);
+    g_signal_connect(deterministic_decoding_button, "clicked", G_CALLBACK(onDeterministicDecodingClicked), deterministic_decoding_file_chooser_button);
+    g_signal_connect(nondeterministic_decoding_button, "clicked", G_CALLBACK(onNondeterministicDecodingClicked), nondeterministic_decoding_file_chooser_button);
 
-    g_signal_connect(coding_page_button, "clicked", G_CALLBACK(SwitchToCoding), stack);
-    g_signal_connect(decoding_page_button, "clicked", G_CALLBACK(SwitchToDeCoding), stack);
+    g_signal_connect(deterministic_coding_page_button, "clicked", G_CALLBACK(SwitchToDeterministicCoding), stack);
+    g_signal_connect(deterministic_decoding_page_button, "clicked", G_CALLBACK(SwitchToDeterministicDeCoding), stack);
+    g_signal_connect(nondeterministic_decoding_page_button, "clicked", G_CALLBACK(SwitchToNondeterministicDeCoding), stack);
 
     gtk_builder_connect_signals(builder, nullptr);
     g_object_unref(builder);
