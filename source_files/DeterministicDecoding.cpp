@@ -2,9 +2,12 @@
 
 #include "../header_files/Transition.h"
 
-DeterministicDecoding::DeterministicDecoding(char *filename, int depth, double intensity) {
+DeterministicDecoding::DeterministicDecoding(char *filename, char *saved_filename, int depth, int initial_state) {
     this->depth = depth;
     this->decoding_image_size = 1 << depth; // The size of the image (2^res)
+
+    this->directory = g_path_get_dirname(filename);
+    this->saved_filename = saved_filename;
 
     this->pixels_colors = (double *)malloc(this->decoding_image_size*this->decoding_image_size*sizeof(double));
 
@@ -30,8 +33,8 @@ DeterministicDecoding::DeterministicDecoding(char *filename, int depth, double i
     this->D = new Transition*[this->n];
 
     // Initialize I
-    // start state
-    this->I = new Transition(0, intensity);
+    initial_state--;
+    this->I = new Transition(initial_state < this->n ? initial_state : 0, 1);
 
     // Initialize the Inn, it's an nxn identity matrix for the first call.
     for (int i = 0; i < this->n; ++i) {
@@ -154,9 +157,9 @@ void DeterministicDecoding::free_array_of_elements(Transition** &arr, int size) 
     delete[] arr;
 }
 
-void DeterministicDecoding::Start(char *directory, char *saved_filename) {
+void DeterministicDecoding::Start() {
     DecodePixelsColors(this->depth, 0, 0, this->I, this->Inn);
-    char *saved_file_path = SaveDecodedImage(directory, saved_filename);
+    char *saved_file_path = SaveDecodedImage(this->directory, this->saved_filename);
 
     OpenImage(saved_file_path);
 
@@ -164,14 +167,6 @@ void DeterministicDecoding::Start(char *directory, char *saved_filename) {
 }
 
 void DeterministicDecoding::DecodePixelsColors(int level, int x, int y, const Transition* &previous_matrix, Transition **next_matrix) {
-
-    // Process GTK events to keep the UI responsive
-    this->calling_counter++;
-    if(this->calling_counter % 10000 == 0) {
-        g_print(".");
-        while (gtk_events_pending())
-            gtk_main_iteration();
-    }
 
     if(level > 0 ) {
         double value = 0;
@@ -228,8 +223,7 @@ void DeterministicDecoding::OpenImage(char *full_path) const{
     //gtk_init(&argc, &argv);
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "WFA Image");
-    gtk_window_set_default_size(GTK_WINDOW(window), 400, 300);
+    gtk_window_set_title(GTK_WINDOW(window), "Dekódolt kép");
 
     vbox = gtk_vbox_new(FALSE, 5);
     gtk_container_add(GTK_CONTAINER(window), vbox);

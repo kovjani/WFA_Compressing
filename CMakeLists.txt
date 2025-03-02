@@ -21,6 +21,8 @@ add_executable(WFA main.cpp
         source_files/Quadrant.cpp
         header_files/Quadrant.h
         source_files/Transition.cpp
-        header_files/Transition.h)
+        header_files/Transition.h
+        source_files/NondeterministicCoding.cpp
+)
 
 target_link_libraries(WFA ${GTK_LIBRARIES} GSL::gsl GSL::gslcblas m)

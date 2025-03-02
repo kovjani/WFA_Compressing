@@ -1,8 +1,11 @@
 #include "../header_files/NondeterministicDecoding.h"
 
-NondeterministicDecoding::NondeterministicDecoding(char *filename, int depth, double intensity) {
+NondeterministicDecoding::NondeterministicDecoding(char *filename, char *saved_filename, int depth, int initial_state) {
     this->depth = depth;
     this->decoding_image_size = 1 << depth; // The size of the image (2^res)
+
+    this->directory = g_path_get_dirname(filename);
+    this->saved_filename = saved_filename;
 
     this->pixels_colors = (double *)malloc(this->decoding_image_size*this->decoding_image_size*sizeof(double));
 
@@ -28,11 +31,18 @@ NondeterministicDecoding::NondeterministicDecoding(char *filename, int depth, do
     this->D.resize(this->n, this->n);
 
     // Initialize I
-    // start state
     this->I.setIdentity();
 
     // Initialize the Inn, it's an nxn identity matrix for the first call.
     this->Inn.setIdentity();
+
+    initial_state--; //the first state is the 0. index
+
+    // Set I as an identity vector according to initial state.
+    if(initial_state < I.size())
+        for (int i = 0; i < I.size(); ++i) {
+            I(i) = Inn(initial_state, i);
+        }
 
     // Initialize F
     // The second line is the F (n*1 matrix), the average colors of states.
@@ -108,9 +118,9 @@ NondeterministicDecoding::~NondeterministicDecoding() {
     delete this->pixels_colors;
 }
 
-void NondeterministicDecoding::Start(char *directory, char *saved_filename) {
+void NondeterministicDecoding::Start() {
     DecodePixelsColors(this->depth, 0, 0, this->I, this->Inn);
-    char *saved_file_path = SaveDecodedImage(directory, saved_filename);
+    char *saved_file_path = SaveDecodedImage(this->directory, this->saved_filename);
 
     OpenImage(saved_file_path);
 
@@ -118,15 +128,6 @@ void NondeterministicDecoding::Start(char *directory, char *saved_filename) {
 }
 
 void NondeterministicDecoding::DecodePixelsColors(int level, int x, int y, const RowVectorXd &previous_result, const MatrixXd &next_matrix) {
-
-    // Process GTK events to keep the UI responsive
-    this->calling_counter++;
-    if(this->calling_counter % 10000 == 0) {
-        g_print(".");
-        while (gtk_events_pending())
-            gtk_main_iteration();
-    }
-
     if(level > 0 ) {
         // Matrix multiplication
         RowVectorXd result = previous_result * next_matrix;
@@ -145,7 +146,7 @@ void NondeterministicDecoding::DecodePixelsColors(int level, int x, int y, const
     // Pixels
     double average_color = previous_result * this->F;
 
-    this->pixels_colors[y * this->decoding_image_size + x] = average_color;
+    this->pixels_colors[x * this->decoding_image_size + y] = average_color;
 }
 
 void NondeterministicDecoding::OpenImage(char *full_path) const{
@@ -154,8 +155,7 @@ void NondeterministicDecoding::OpenImage(char *full_path) const{
     GtkWidget *vbox;
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "WFA Image");
-    gtk_window_set_default_size(GTK_WINDOW(window), 400, 300);
+    gtk_window_set_title(GTK_WINDOW(window), "Dekódolt kép");
 
     vbox = gtk_vbox_new(FALSE, 5);
     gtk_container_add(GTK_CONTAINER(window), vbox);

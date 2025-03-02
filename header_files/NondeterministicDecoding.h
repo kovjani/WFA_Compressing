@@ -15,15 +15,17 @@ using namespace Eigen;
 class NondeterministicDecoding {
 public:
     NondeterministicDecoding() = default;
-    NondeterministicDecoding(char *filename, int depth, double intensity);
+    NondeterministicDecoding(char *filename, char *saved_filename, int depth, int initial_state);
     ~NondeterministicDecoding();
-    void Start(char *directory, char *saved_filename);
+    void Start();
 
 private:
     //Inn is an nxn identity matrix for the first call.
     MatrixXd A{}, B{}, C{}, D{}, Inn{};
     RowVectorXd I{};
     VectorXd F{};
+
+    char *directory{}, *saved_filename{};
 
     int n{};  // Number of states.
     int depth{}; // Decoding resolution, maximum depth of recursion

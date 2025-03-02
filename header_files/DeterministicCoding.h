@@ -5,9 +5,9 @@
 #include <fstream>
 #include <iomanip>
 #include <string>
+#include <cstring>
 #include <cmath>
 #include <algorithm>
-#include <thread>
 #include <functional>
 #include <gtk/gtk.h>
 #include <glib.h>
@@ -20,7 +20,7 @@ using namespace std;
 class DeterministicCoding {
 public:
     DeterministicCoding() = default;
-    explicit DeterministicCoding(const char *filename, double epsilon);
+    explicit DeterministicCoding(char *opened_filename, char *saved_filename, double epsilon);
     ~DeterministicCoding();
     void Start();
 
@@ -29,14 +29,18 @@ private:
     GdkPixbuf *pixbuf{};
     Transition **A{}, **B{}, **C{}, **D{};
     Quadrant **quadtree{}, **states{}, **sorted_states{};
+
+    char *directory{}, *saved_filename{};
+
     int width{0};
     int height{0};
     int coding_image_size{0};
     int depth{0};
     int quadtree_size{0}; // Quadtree size
     double EPS{0.0001};
+    int rounded{4};
     int states_counter{0};
-    // int calling_counter{0};
+    int calling_counter{0};
 
     Quadrant *CreateQuadtree(int level, int index, int x, int y);
     void CreateWFA();

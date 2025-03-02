@@ -1,13 +1,16 @@
 #include "../header_files/DeterministicCoding.h"
 
-DeterministicCoding::DeterministicCoding(const char *filename, double epsilon) {
+DeterministicCoding::DeterministicCoding(char *opened_filename, char *saved_filename, double epsilon) {
     this->EPS = epsilon;
 
     // Open the image and split it into pieces, than store it in a quadtree.
     // It helps to create the automaton.
 
     // Open image
-    this->pixbuf = gdk_pixbuf_new_from_file(filename, &this->error);
+    this->pixbuf = gdk_pixbuf_new_from_file(opened_filename, &this->error);
+
+    this->directory = g_path_get_dirname(opened_filename);
+    this->saved_filename = saved_filename;
 
     // Compare pixel colors and create automata.
 
@@ -36,6 +39,8 @@ DeterministicCoding::DeterministicCoding(const char *filename, double epsilon) {
     this->B = new Transition *[this->quadtree_size];
     this->C = new Transition *[this->quadtree_size];
     this->D = new Transition *[this->quadtree_size];
+
+    // g_free(opened_filename);
 }
 
 DeterministicCoding::~DeterministicCoding() {
@@ -92,7 +97,11 @@ void DeterministicCoding::Start() {
 
     CreateWFA();
 
-    SaveWFA("/home/jani/wfa.wfa");
+    char *filename_with_path = g_build_filename(this->directory, this->saved_filename, NULL);
+
+    SaveWFA(filename_with_path);
+
+    g_free(filename_with_path);
 
 }
 
@@ -112,22 +121,12 @@ void DeterministicCoding::CreateWFA() {
         ScanState(*scanned_state->c, 'c');
         ScanState(*scanned_state->d, 'd');
 
-       // if( i % 100 == 2)
-            g_print("%d\n", this->states_counter);
     }
 }
 
 void DeterministicCoding::ScanState(Quadrant &quadrant, char quadrant_symbol) {
 
     for (int i = 0; i < this->states_counter; ++i) {
-         /*this->calling_counter++;
-        if(this->calling_counter % 100000 == 0) {
-            // Process GTK events to keep the UI responsive
-            while (gtk_events_pending())
-                gtk_main_iteration();
-            g_print("%d\n", this->states_counter);
-        }*/
-
         // state image vs quadrant
         Quadrant *state_image = this->states[i];
 
@@ -272,7 +271,7 @@ void DeterministicCoding::SaveWFA(const char *filename) {
     for (int i = 0; i < this->states_counter; ++i) {
         // Round value to 4 decimals
         ostringstream oss;
-        oss << fixed << setprecision(4) << this->states[i]->brightness;
+        oss << fixed << setprecision(this->rounded) << this->states[i]->brightness;
         std::string brightness = oss.str();
 
         // Remove trailing zeros
@@ -303,7 +302,7 @@ void DeterministicCoding::SaveWFA(const char *filename) {
 
         // Round value to 4 decimals
         ostringstream oss;
-        oss << fixed << setprecision(4) << this->A[i]->value;
+        oss << fixed << setprecision(this->rounded) << this->A[i]->value;
         std::string brightness = oss.str();
 
         // Remove trailing zeros
@@ -334,7 +333,7 @@ void DeterministicCoding::SaveWFA(const char *filename) {
 
         // Round value to 4 decimals
         ostringstream oss;
-        oss << fixed << setprecision(4) << this->B[i]->value;
+        oss << fixed << setprecision(this->rounded) << this->B[i]->value;
         std::string brightness = oss.str();
 
         // Remove trailing zeros
@@ -365,7 +364,7 @@ void DeterministicCoding::SaveWFA(const char *filename) {
 
         // Round value to 4 decimals
         ostringstream oss;
-        oss << fixed << setprecision(4) << this->C[i]->value;
+        oss << fixed << setprecision(this->rounded) << this->C[i]->value;
         std::string brightness = oss.str();
 
         // Remove trailing zeros
@@ -396,7 +395,7 @@ void DeterministicCoding::SaveWFA(const char *filename) {
 
         // Round value to 4 decimals
         ostringstream oss;
-        oss << fixed << setprecision(4) << this->D[i]->value;
+        oss << fixed << setprecision(this->rounded) << this->D[i]->value;
         std::string brightness = oss.str();
 
         // Remove trailing zeros

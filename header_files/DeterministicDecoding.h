@@ -16,13 +16,15 @@ using namespace std;
 class DeterministicDecoding {
 public:
     DeterministicDecoding() = default;
-    DeterministicDecoding(char *filename, int depth, double intensity);
+    DeterministicDecoding(char *filename, char *saved_filename, int depth, int initial_state);
     ~DeterministicDecoding();
-    void Start(char *directory, char *saved_filename);
+    void Start();
 
 private:
     Transition **A{}, **B{}, **C{}, **D{}, **F{}, **Inn{}; //Inn is an nxn identity matrix for the first call.
     const Transition *I{};
+
+    char *directory{}, *saved_filename{};
 
     int n{};  // Number of states.
     int depth{}; // Decoding resolution, maximum depth of recursion
