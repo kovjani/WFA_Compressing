@@ -2,6 +2,8 @@
 
 #include "../header_files/NondeterministicCoding.h"
 
-Quadrant::Quadrant(double brightness) {
+Quadrant::Quadrant(int level, int quadtree_index, double brightness) {
+    this->level = level;
+    this->quadtree_index = quadtree_index;
     this->brightness = brightness;
 }

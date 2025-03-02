@@ -6,16 +6,12 @@
 class Quadrant {
 public:
     double brightness{0};
-    int index{0};
+    int state_index{0};
+    int quadtree_index{0};
     int level{0};
 
-    // Don't need free these pointers, because in this claas there is no memory allocation.
-    Quadrant *parent{};
-    //Children
-    Quadrant *a{}, *b{}, *c{}, *d{};
-
     Quadrant() = default;
-    explicit Quadrant(double brightness);
+    explicit Quadrant(int level, int quadtree_index, double brightness);
     ~Quadrant() = default;
 };
 

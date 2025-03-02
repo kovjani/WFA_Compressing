@@ -23,6 +23,8 @@ add_executable(WFA main.cpp
         source_files/Transition.cpp
         header_files/Transition.h
         source_files/NondeterministicCoding.cpp
+        source_files/Coding.cpp
+        header_files/Coding.h
 )
 
 target_link_libraries(WFA ${GTK_LIBRARIES} GSL::gsl GSL::gslcblas m)
