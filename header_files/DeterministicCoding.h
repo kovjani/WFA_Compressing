@@ -12,7 +12,7 @@ private:
 
 protected:
     void CreateWFA() override;
-    void ScanState(Quadrant &quadrant, char quadrant_symbol, int parent_state_index) override;
+    void ScanState(Quadrant &quadrant, char quadrant_symbol, int &parent_state_index) override;
     void SaveWFA(const char *filename) override;
 
 public:

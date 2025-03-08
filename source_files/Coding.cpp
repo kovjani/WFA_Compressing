@@ -1,10 +1,11 @@
 #include "../header_files/Coding.h"
 
-Coding::Coding(const char *opened_filename, const char *saved_filename, int details, double epsilon) {
+Coding::Coding(const char *opened_filename, const char *saved_filename, int coding_depth, double epsilon) {
     this->directory = g_path_get_dirname(opened_filename);
     this->saved_filename = saved_filename;
     this->EPS = epsilon;
-    this->details = details;
+    this->coding_depth = coding_depth;
+    this->details = static_cast<int>(std::pow(4, coding_depth));
 
     //Open the image and split it into pieces.
 
@@ -26,8 +27,8 @@ Coding::Coding(const char *opened_filename, const char *saved_filename, int deta
     this->quadtree_size = 0;
 
     // In this iteration the maximum value of i is depth-1
-    for (int i = 0; i < this->depth; ++i) {
-        this->quadtree_size += pow(4, i);
+    for (int i = 0; i <= this->depth; ++i) {
+        this->quadtree_size += static_cast<int>(std::pow(4, i));
     }
 
     this->quadtree = new Quadrant[this->quadtree_size];
@@ -46,15 +47,6 @@ Coding::~Coding() {
     this->states = nullptr;
 }
 
-const Quadrant& Coding::operator[](unsigned i) const {
-    double j = i;
-    while(j >= this->quadtree_size) {
-        j /= 4;
-    }
-    i = static_cast<int>(floor(j));
-    return this->quadtree[i];
-}
-
 void Coding::Start() {
 
     CreateQuadtree(this->depth, 0, 0, 0);
@@ -69,30 +61,38 @@ void Coding::Start() {
 
 }
 
+double Coding::roundToOneDecimal(double x) {
+    return std::round(x * 10.0) / 10.0;
+}
+
+void Coding::GetQuadrants(int level, int &index, const Quadrant &q, Quadrant *quadrants) const {
+    if(level > 0) {
+        GetQuadrants(level-1, index, *q.a, quadrants);
+        GetQuadrants(level-1, index, *q.b, quadrants);
+        GetQuadrants(level-1, index, *q.c, quadrants);
+        GetQuadrants(level-1, index, *q.d, quadrants);
+    } else {
+        quadrants[index++] = q;
+    }
+}
+
 double Coding::CompareQuadrants(const Quadrant &q1, const Quadrant &q2) const {
 
     // q1: quadrant
     // q2: state image
 
     // If costs are equal for all nodes according to epsilon, return cost else return -1
+    double cost_a = q1.a->brightness / q2.a->brightness;
+    double cost_b = q1.b->brightness / q2.b->brightness;
+    double cost_c = q1.c->brightness / q2.c->brightness;
+    double cost_d = q1.d->brightness / q2.d->brightness;
 
-    // i = 1
-    double q1_brightness = (*this)[this->details*q1.quadtree_index + 1].brightness;
-    double q2_brightness = (*this)[this->details*q2.quadtree_index + 1].brightness;
-    double cost = q1_brightness / q2_brightness;
-
-    for (int i = 2; i <= this->details; ++i) {
-        q1_brightness = (*this)[this->details*q1.quadtree_index + i].brightness;
-        q2_brightness = (*this)[this->details*q2.quadtree_index + i].brightness;
-        double next_cost = q1_brightness / q2_brightness;
-
-        // if not equals
-        if(fabs(cost - next_cost) > this->EPS) {
-            return -1;
-        }
+    // If costs are equal for all nodes according to epsilon, return cost else return -1
+    if( fabs(cost_a - cost_b) <= this->EPS && fabs(cost_a - cost_c) <= this->EPS && fabs(cost_a - cost_d) <= this->EPS  ){
+        return cost_a;
     }
 
-    return cost;
+    return -1;
 }
 
 double Coding::CreateQuadtree(int level, int index, int x, int y){
@@ -109,10 +109,14 @@ double Coding::CreateQuadtree(int level, int index, int x, int y){
 
         // Store quadrants in a quadtree
         // When level == 1, in the (n-1). recursion level a quadrant is sum of 4 pixels.
-
         const double quadrant_average_color = (a+b+c+d) / 4;
 
         this->quadtree[index] = Quadrant(level, index, quadrant_average_color);
+
+        this->quadtree[index].a = &this->quadtree[4*index+1];
+        this->quadtree[index].b = &this->quadtree[4*index+2];
+        this->quadtree[index].c = &this->quadtree[4*index+3];
+        this->quadtree[index].d = &this->quadtree[4*index+4];
 
         return quadrant_average_color;
     }
@@ -127,7 +131,15 @@ double Coding::CreateQuadtree(int level, int index, int x, int y){
     const int g = p[1];
     const int b = p[2];
 
-    //Do not store pixels as quadrants, just the average color of 4 pixel.
     double brightness = (static_cast<double>(r + g + b) / 3) / 255;
+
+    this->quadtree[index] = Quadrant(level, index, fabs(brightness) < 0.0001 ? 0.0001 : brightness);
+
+    // Leafs children reference to parents (leafs).
+    this->quadtree[index].a = &this->quadtree[index];
+    this->quadtree[index].b = &this->quadtree[index];
+    this->quadtree[index].c = &this->quadtree[index];
+    this->quadtree[index].d = &this->quadtree[index];
+
     return fabs(brightness) < 0.0001 ? 0.0001 : brightness;
 }

@@ -24,21 +24,21 @@ DeterministicDecoding::DeterministicDecoding(char *filename, char *saved_filenam
     getline(wfa_file, line);     // \n
 
     // Allocate memory
-    this->Inn = new Transition*[this->n];
-    this->F = new Transition*[this->n];
+    this->Inn = new Transition[this->n];
+    this->F = new Transition[this->n];
 
-    this->A = new Transition*[this->n];
-    this->B = new Transition*[this->n];
-    this->C = new Transition*[this->n];
-    this->D = new Transition*[this->n];
+    this->A = new Transition[this->n];
+    this->B = new Transition[this->n];
+    this->C = new Transition[this->n];
+    this->D = new Transition[this->n];
 
     // Initialize I
     initial_state--;
-    this->I = new Transition(initial_state < this->n ? initial_state : 0, 1);
+    this->I = Transition(initial_state < this->n ? initial_state : 0, 1);
 
     // Initialize the Inn, it's an nxn identity matrix for the first call.
     for (int i = 0; i < this->n; ++i) {
-        this->Inn[i] = new Transition(i, 1);
+        this->Inn[i] = Transition(i, 1);
     }
 
     // Initialize F
@@ -49,7 +49,7 @@ DeterministicDecoding::DeterministicDecoding(char *filename, char *saved_filenam
 
         for (int i = 0; i < this->n; ++i) {
             getline(line_stream, token, ' '); // Split line by space and get the next token
-            this->F[i] = new Transition(0, stod(token) * 255);
+            this->F[i] = Transition(0, stod(token) * 255);
         }
     }
 
@@ -70,7 +70,7 @@ DeterministicDecoding::DeterministicDecoding(char *filename, char *saved_filenam
             value = stod(token);
         }
 
-        this->A[i] = new Transition(j, value);
+        this->A[i] = Transition(j, value);
     }
 
     getline(wfa_file, line);     // \n
@@ -90,7 +90,7 @@ DeterministicDecoding::DeterministicDecoding(char *filename, char *saved_filenam
             value = stod(token);
         }
 
-        this->B[i] = new Transition(j, value);
+        this->B[i] = Transition(j, value);
     }
 
     getline(wfa_file, line);     // \n
@@ -110,7 +110,7 @@ DeterministicDecoding::DeterministicDecoding(char *filename, char *saved_filenam
             value = stod(token);
         }
 
-        this->C[i] = new Transition(j, value);
+        this->C[i] = Transition(j, value);
     }
 
     getline(wfa_file, line);    // \n
@@ -130,31 +130,33 @@ DeterministicDecoding::DeterministicDecoding(char *filename, char *saved_filenam
             value = stod(token);
         }
 
-        this->D[i] = new Transition(j, value);
+        this->D[i] = Transition(j, value);
     }
 }
 
 DeterministicDecoding::~DeterministicDecoding() {
     // Free the allocated memory
 
-    free_array_of_elements(this->A, this->n);
-    free_array_of_elements(this->B, this->n);
-    free_array_of_elements(this->C, this->n);
-    free_array_of_elements(this->D, this->n);
-    free_array_of_elements(this->Inn, this->n);
-    free_array_of_elements(this->F, this->n);
+    delete[] this->A;
+    this->A = nullptr;
 
-    delete this->I;
+    delete[] this->B;
+    this->B = nullptr;
+
+    delete[] this->C;
+    this->C = nullptr;
+
+    delete[] this->D;
+    this->D = nullptr;
+
+    delete[] this->Inn;
+    this->Inn = nullptr;
+
+    delete[] this->F;
+    this->F = nullptr;
 
     delete this->pixels_colors;
-}
-
-void DeterministicDecoding::free_array_of_elements(Transition** &arr, int size) {
-    for (int i = 0; i < size; ++i) {
-        delete arr[i];
-        arr[i] = nullptr;
-    }
-    delete[] arr;
+    this->pixels_colors = nullptr;
 }
 
 void DeterministicDecoding::Start() {
@@ -166,7 +168,7 @@ void DeterministicDecoding::Start() {
     g_free(saved_file_path);
 }
 
-void DeterministicDecoding::DecodePixelsColors(int level, int x, int y, const Transition* &previous_matrix, Transition **next_matrix) {
+void DeterministicDecoding::DecodePixelsColors(int level, int x, int y, const Transition &previous_matrix, Transition *next_matrix) {
 
     if(level > 0 ) {
         double value = 0;
@@ -174,19 +176,19 @@ void DeterministicDecoding::DecodePixelsColors(int level, int x, int y, const Tr
 
         // Matrix multiplication
         // Previous_matrix always has one element, because the automata is deterministic.
-        const Transition *pre = previous_matrix;
+        const Transition pre = previous_matrix;
         for (int i = 0; i < this->n; ++i) {
-            Transition *next = next_matrix[i];
+            Transition next = next_matrix[i];
             // i = next->i
-            if(pre->j == i) {
-                value = pre->value * next->value;
+            if(pre.j == i) {
+                value = pre.value * next.value;
                 // pre->i is always 0, because the previous matrix is a row vector
-                res_j = next->j;
+                res_j = next.j;
                 break;
             }
         }
 
-        const Transition* result = new Transition(res_j, value);
+        const Transition result = Transition(res_j, value);
         int quadrant_size = 1 << level; // 2^level
 
         DecodePixelsColors(level-1, x, y, result, this->A);
@@ -194,19 +196,17 @@ void DeterministicDecoding::DecodePixelsColors(int level, int x, int y, const Tr
         DecodePixelsColors(level-1, x, y + quadrant_size/2, result, this->C);
         DecodePixelsColors(level-1, x + quadrant_size/2, y + quadrant_size/2,result, this->D);
 
-        delete result;
-
         return;
     }
     // else
     // Pixels
     double average_color = 0;
-    const Transition *pre = previous_matrix;
+    const Transition pre = previous_matrix;
 
     for (int i = 0; i < this->n; ++i) {
         // i = this->F[i]->i
-        if(pre->j == i) {
-            average_color = pre->value * this->F[i]->value;
+        if(pre.j == i) {
+            average_color = pre.value * this->F[i].value;
             break;
         }
     }

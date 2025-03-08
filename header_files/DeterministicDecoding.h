@@ -21,8 +21,8 @@ public:
     void Start();
 
 private:
-    Transition **A{}, **B{}, **C{}, **D{}, **F{}, **Inn{}; //Inn is an nxn identity matrix for the first call.
-    const Transition *I{};
+    Transition *A{}, *B{}, *C{}, *D{}, *F{}, *Inn{}; //Inn is an nxn identity matrix for the first call.
+    Transition I{};
 
     char *directory{}, *saved_filename{};
 
@@ -33,8 +33,7 @@ private:
     double *pixels_colors{};
     char *SaveDecodedImage(char *directory, char *filename) const;
     void OpenImage(char *full_path) const;
-    void DecodePixelsColors(int level, int x, int y, const Transition* &previous_matrix, Transition **next_matrix);
-    void free_array_of_elements(Transition** &arr, int size);
+    void DecodePixelsColors(int level, int x, int y, const Transition &previous_matrix, Transition *next_matrix);
 };
 
 #endif //DETERMINISTICDECODING_H

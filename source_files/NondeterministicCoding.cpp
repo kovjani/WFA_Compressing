@@ -2,65 +2,35 @@
 
 #include <iomanip>
 
-NondeterministicCoding::NondeterministicCoding(const char *opened_filename, const char *saved_filename, int details, double epsilon, int number_of_states)
+NondeterministicCoding::NondeterministicCoding(const char *opened_filename, const char *saved_filename, int details, double epsilon)
     : Coding(opened_filename, saved_filename, details, epsilon){
-
-    this->number_of_states = number_of_states;
+    A.setZero();
+    B.setZero();
+    C.setZero();
+    D.setZero();
+    M.setZero();
 }
 
 void NondeterministicCoding::CreateWFA() {
 
-    this->A.resize(this->number_of_states, this->number_of_states);
-    this->B.resize(this->number_of_states, this->number_of_states);
-    this->C.resize(this->number_of_states, this->number_of_states);
-    this->D.resize(this->number_of_states, this->number_of_states);
-
-    this->F.resize(this->number_of_states);
-
-    this->A.setZero();
-    this->B.setZero();
-    this->C.setZero();
-    this->D.setZero();
-
-    this->F.setZero();
-
-    for (int i = 0; this->states_counter < this->number_of_states && i < this->number_of_states * 2; ++i) {
-        /*bool state_found = false;
-        for (int j = 0; j < this->states_counter; ++j) {
-            double result = CompareQuadrants(this->quadtree[i], this->states[j]);
-
-            if(result != -1) {
-            //if(fabs(this->quadtree[i]->brightness - this->states[j]->brightness) < 0.01) {
-                state_found = true;
-                break;
-            }
-        }*/
-       // if(!state_found) {
-            this->states[this->states_counter] = this->quadtree[i];
-            this->F(this->states_counter) = this->quadtree[i].brightness;
-            // g_print("%f ", F(this->states_counter));
-            this->states_counter++;
-        //}
+    // First state
+    this->states[0] = this->quadtree[0];
+    Quadrant *state_quadrants = new Quadrant[this->details];
+    int index = 0;
+    GetQuadrants(this->coding_depth, index, this->states[0], state_quadrants);
+    for (int j = 0; j < this->details; j++) {
+        M(j, 0) = state_quadrants[j].brightness;
     }
+    delete[] state_quadrants;
 
-    if(this->number_of_states != this->states_counter){
-        this->states_counter = this->number_of_states;
-        for (int i = 0; i < this->number_of_states; ++i) {
-            this->states[i] = this->quadtree[i];
-            this->F(i) = this->quadtree[i].brightness;
-        }
-    }
-
-    for (int i = 0; i < this->number_of_states; ++i) {
+    for (int i = 0; i < this->states_counter; ++i) {
 
         Quadrant scanned_state = this->states[i];
 
-        int si = scanned_state.quadtree_index;
-
-        Quadrant a = (*this)[4*si + 1];
-        Quadrant b = (*this)[4*si + 2];
-        Quadrant c = (*this)[4*si + 3];
-        Quadrant d = (*this)[4*si + 4];
+        Quadrant a = *scanned_state.a;
+        Quadrant b = *scanned_state.b;
+        Quadrant c = *scanned_state.c;
+        Quadrant d = *scanned_state.d;
 
         ScanState(a, 'a', i);
         ScanState(b, 'b', i);
@@ -70,32 +40,70 @@ void NondeterministicCoding::CreateWFA() {
     }
 }
 
-VectorXd NondeterministicCoding::FindCoefficients(const VectorXd& phi) {
-    MatrixXd A(phi.size(), this->number_of_states);
+void NondeterministicCoding::ScanState(Quadrant &quadrant, char quadrant_symbol, int &parent_state_index) {
 
-    for (int i = 0; i < this->number_of_states; ++i) {
-        int state = this->states[i].quadtree_index;
-        for (int j = 0; j < phi.size(); j++) {
-            A(j, i) = (*this)[phi.size() * state + j + 1].brightness;
+    VectorXd b(this->details);
+
+    Quadrant *quadrantsb = new Quadrant[b.size()];
+    int index = 0;
+    GetQuadrants(this->coding_depth, index, quadrant, quadrantsb);
+
+    for (int i = 0; i < b.size(); ++i) {
+        b(i) = quadrantsb[i].brightness;
+    }
+
+    delete[] quadrantsb;
+
+    // Solve the linear least squares problem using QR decomposition
+    VectorXd X = M.colPivHouseholderQr().solve(b);
+
+    RowVectorXd S(this->states_counter);
+    for (int i = 0; i < this->states_counter; ++i) {
+        S(i) = this->states[i].brightness;
+    }
+
+    // Check if quadrant can be created by linear combination of other states.
+    if(fabs((S * X) - quadrant.brightness) > this->EPS) {
+        // If not, create new state representing scaned quadrant.
+        this->states_counter++;
+
+        g_print("%d:%d\n", parent_state_index, this->states_counter);
+
+        A.conservativeResize(this->states_counter, this->states_counter);
+        A.rightCols(1).setZero();
+        A.bottomRows(1).setZero();
+
+        B.conservativeResize(this->states_counter, this->states_counter);
+        B.rightCols(1).setZero();
+        B.bottomRows(1).setZero();
+
+        C.conservativeResize(this->states_counter, this->states_counter);
+        C.rightCols(1).setZero();
+        C.bottomRows(1).setZero();
+
+        D.conservativeResize(this->states_counter, this->states_counter);
+        D.rightCols(1).setZero();
+        D.bottomRows(1).setZero();
+
+
+        quadrant.state_index = this->states_counter - 1;
+        this->states[this->states_counter - 1] = quadrant;
+
+
+        M.conservativeResize(this->details, this->states_counter);
+        Quadrant *state_quadrants = new Quadrant[this->details];
+        index = 0;
+        GetQuadrants(this->coding_depth, index, quadrant, state_quadrants);
+        for (int j = 0; j < this->details; j++) {
+            M(j, this->states_counter - 1) = state_quadrants[j].brightness;
         }
+        delete[] state_quadrants;
+
+
+        X.resize(this->states_counter);
+        X.setZero();
+        X(quadrant.state_index) = 1;
     }
-
-    // Solve the linear least squares problem with L2 regularization
-    MatrixXd ATA = A.transpose() * A;
-    VectorXd ATphi = A.transpose() * phi;
-    VectorXd coefficients = ATA.ldlt().solve(ATphi);
-
-    return coefficients;
-}
-
-void NondeterministicCoding::ScanState(Quadrant &quadrant, char quadrant_symbol, int parent_state_index) {
-
-    VectorXd phi(this->details);
-    for (int i = 0; i < phi.size(); ++i) {
-        phi(i) = (*this)[phi.size() * quadrant.quadtree_index + i + 1].brightness;
-    }
-
-    VectorXd X = FindCoefficients(phi);
 
     switch (quadrant_symbol) {
         case 'a':

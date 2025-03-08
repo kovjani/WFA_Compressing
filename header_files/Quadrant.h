@@ -10,6 +10,8 @@ public:
     int quadtree_index{0};
     int level{0};
 
+    Quadrant *a{}, *b{}, *c{}, *d{};
+
     Quadrant() = default;
     explicit Quadrant(int level, int quadtree_index, double brightness);
     ~Quadrant() = default;

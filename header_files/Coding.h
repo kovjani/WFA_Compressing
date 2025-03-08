@@ -30,25 +30,25 @@ protected:
     int quadtree_size{0};
     double EPS{0.0001};
     int rounded{4};
-    int details{4};
-    int states_counter{0};
+    int coding_depth{1};
+    int details{4}; //4^coding_depth
+    int states_counter{1};
+
+    double roundToOneDecimal(double x);
 
     double CreateQuadtree(int level, int index, int x, int y);
-    [[nodiscard]] double CompareQuadrants(const Quadrant &q1, const Quadrant &q2) const;
+    double CompareQuadrants(const Quadrant &q1, const Quadrant &q2) const;
+    void GetQuadrants(int level, int &index, const Quadrant &q, Quadrant *quadrants) const;
 
     virtual void CreateWFA(){}
-    virtual void ScanState(Quadrant &quadrant, char quadrant_symbol, int parent_state_index){}
+    virtual void ScanState(Quadrant &quadrant, char quadrant_symbol, int &parent_state_index){}
     virtual void SaveWFA(const char *filename){}
-
-    const Quadrant& operator[](unsigned i) const;
 
 public:
     Coding() = default;
-    Coding(const char *opened_filename, const char *saved_filename, int details, double epsilon);
+    Coding(const char *opened_filename, const char *saved_filename, int coding_depth, double epsilon);
     virtual ~Coding();
     void Start();
 };
-
-
 
 #endif //CODING_H

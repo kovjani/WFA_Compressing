@@ -19,7 +19,7 @@ static GtkWidget *deterministic_decoding_page_button = nullptr;
 static GtkWidget *nondeterministic_coding_page_button = nullptr;
 static GtkWidget *nondeterministic_decoding_page_button = nullptr;
 
-static GtkSpinButton *spin_depth_dd = nullptr, *spin_state_dd = nullptr, *spin_depth_nc = nullptr, *spin_state_nc = nullptr;
+static GtkSpinButton *spin_depth_dd = nullptr, *spin_state_dd = nullptr, *spin_depth_nc = nullptr;
 static GtkSpinButton *spin_depth_nd = nullptr, *spin_state_nd = nullptr;
 static GtkComboBoxText *combo_resolution_nd = nullptr, *combo_resolution_dd = nullptr, *combo_detail_nc = nullptr;
 
@@ -169,25 +169,24 @@ void onNondeterministicCodingClicked(GtkWidget *clicked_button, GtkWidget *file_
     char *basename = g_path_get_basename(filename);
     char *basename_without_extension = RemoveExtension(basename);
 
-    int number_of_states = static_cast<int>(gtk_spin_button_get_value(spin_state_nc));
-    int details = 4;
+    int coding_depth = 4;
     char* gtk_details = gtk_combo_box_text_get_active_text(combo_detail_nc);
 
-    if(strcmp(gtk_details, "4") == 0) {
-        details = 4;
-    } else if(strcmp(gtk_details, "16") == 0) {
-        details = 16;
-    } else if(strcmp(gtk_details, "64") == 0) {
-        details = 64;
-    } else if(strcmp(gtk_details, "256") == 0) {
-        details = 256;
-    } else if(strcmp(gtk_details, "1024") == 0) {
-        details = 1024;
-    } else if(strcmp(gtk_details, "4096") == 0) {
-        details = 4096;
+    if(strcmp(gtk_details, "1    (4)") == 0) {
+        coding_depth = 1;
+    } else if(strcmp(gtk_details, "2    (16)") == 0) {
+        coding_depth = 2;
+    } else if(strcmp(gtk_details, "3    (64)") == 0) {
+        coding_depth = 3;
+    } else if(strcmp(gtk_details, "4    (256)") == 0) {
+        coding_depth = 4;
+    } else if(strcmp(gtk_details, "5    (1024)") == 0) {
+        coding_depth = 5;
+    } else if(strcmp(gtk_details, "6    (4096)") == 0) {
+        coding_depth = 6;
     }
 
-    NondeterministicCoding code(filename, basename_without_extension, details, 0.0001, number_of_states);
+    NondeterministicCoding code(filename, basename_without_extension, coding_depth, 0.000001);
     strcat(basename_without_extension, ".ndwfa");
 
     running = true;
@@ -217,8 +216,6 @@ void onNondeterministicDecodingClicked(GtkWidget *clicked_button, GtkWidget *fil
     int decoding_depth = 9;
     char* resolution = gtk_combo_box_text_get_active_text(combo_resolution_nd);
     int initial_state = static_cast<int>(gtk_spin_button_get_value(spin_state_nd));
-
-    g_print("%s ", resolution);
 
     if(strcmp(resolution, "128x128") == 0) {
         decoding_depth = 7;
@@ -280,7 +277,6 @@ int main(int argc, char *argv[]) {
     spin_depth_nc = GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "spin_depth_nc"));
     spin_depth_nd = GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "spin_depth_nd"));
     spin_state_nd = GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "spin_state_nd"));
-    spin_state_nc = GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "spin_state_nc"));
 
     combo_resolution_nd = GTK_COMBO_BOX_TEXT(gtk_builder_get_object(builder, "combo_resolution_nd"));
     combo_resolution_dd = GTK_COMBO_BOX_TEXT(gtk_builder_get_object(builder, "combo_resolution_dd"));

@@ -30,13 +30,6 @@
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
-  <object class="GtkAdjustment" id="adjustment_spin_state_nc">
-    <property name="lower">2</property>
-    <property name="upper">1000</property>
-    <property name="value">10</property>
-    <property name="step-increment">1</property>
-    <property name="page-increment">10</property>
-  </object>
   <object class="GtkAdjustment" id="adjustment_state_dd">
     <property name="lower">1</property>
     <property name="upper">100000</property>
@@ -337,7 +330,7 @@
                   </packing>
                 </child>
                 <child>
-                  <!-- n-columns=2 n-rows=2 -->
+                  <!-- n-columns=2 n-rows=1 -->
                   <object class="GtkGrid">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -347,33 +340,11 @@
                       <object class="GtkLabel">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Állapotok száma</property>
+                        <property name="label" translatable="yes">Vizsgált mélység</property>
                       </object>
                       <packing>
                         <property name="left-attach">0</property>
                         <property name="top-attach">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkSpinButton" id="spin_state_nc">
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="adjustment">adjustment_spin_state_nc</property>
-                      </object>
-                      <packing>
-                        <property name="left-attach">1</property>
-                        <property name="top-attach">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Részletesség</property>
-                      </object>
-                      <packing>
-                        <property name="left-attach">0</property>
-                        <property name="top-attach">1</property>
                       </packing>
                     </child>
                     <child>
@@ -383,17 +354,17 @@
                         <property name="active">3</property>
                         <property name="active-id">3</property>
                         <items>
-                          <item id="0" translatable="yes">4</item>
-                          <item id="1" translatable="yes">16</item>
-                          <item id="2" translatable="yes">64</item>
-                          <item id="3" translatable="yes">256</item>
-                          <item id="4" translatable="yes">1024</item>
-                          <item id="5" translatable="yes">4096</item>
+                          <item id="0" translatable="yes">1    (4)</item>
+                          <item id="1" translatable="yes">2    (16)</item>
+                          <item id="2" translatable="yes">3    (64)</item>
+                          <item id="3" translatable="yes">4    (256)</item>
+                          <item id="4" translatable="yes">5    (1024)</item>
+                          <item id="5" translatable="yes">6    (4096)</item>
                         </items>
                       </object>
                       <packing>
                         <property name="left-attach">1</property>
-                        <property name="top-attach">1</property>
+                        <property name="top-attach">0</property>
                       </packing>
                     </child>
                   </object>

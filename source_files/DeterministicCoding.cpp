@@ -22,23 +22,24 @@ DeterministicCoding::~DeterministicCoding() {
 
     delete[] this->D;
     this->D = nullptr;
+
+    delete[] this->states;
+    this->states = nullptr;
 }
 
 void DeterministicCoding::CreateWFA() {
 
     this->quadtree[0].state_index = 0;
-    this->states[this->states_counter++] = quadtree[0];
+    this->states[0] = quadtree[0];
 
     for (int i = 0; i < this->states_counter; ++i) {
 
         Quadrant scanned_state = this->states[i];
 
-        int si = scanned_state.quadtree_index;
-
-        Quadrant a = (*this)[4*si + 1];
-        Quadrant b = (*this)[4*si + 2];
-        Quadrant c = (*this)[4*si + 3];
-        Quadrant d = (*this)[4*si + 4];
+        Quadrant a = *scanned_state.a;
+        Quadrant b = *scanned_state.b;
+        Quadrant c = *scanned_state.c;
+        Quadrant d = *scanned_state.d;
 
         ScanState(a, 'a', i);
         ScanState(b, 'b', i);
@@ -48,7 +49,7 @@ void DeterministicCoding::CreateWFA() {
     }
 }
 
-void DeterministicCoding::ScanState(Quadrant &quadrant, char quadrant_symbol, int parent_state_index) {
+void DeterministicCoding::ScanState(Quadrant &quadrant, char quadrant_symbol, int &parent_state_index) {
 
     for (int i = 0; i < this->states_counter; ++i) {
         // state image vs quadrant
