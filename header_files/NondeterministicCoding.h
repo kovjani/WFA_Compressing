@@ -14,12 +14,10 @@ using namespace Eigen;
 
 class NondeterministicCoding : public Coding {
 private:
-    MatrixXd M{MatrixXd(this->details, this->states_counter)};
+    int coding_depth{0};
+    int details{0};
 
-    MatrixXd A{MatrixXd(this->states_counter, this->states_counter)};
-    MatrixXd B{MatrixXd(this->states_counter, this->states_counter)};
-    MatrixXd C{MatrixXd(this->states_counter, this->states_counter)};
-    MatrixXd D{MatrixXd(this->states_counter, this->states_counter)};
+    MatrixXd M{}, A{}, B{}, C{}, D{};
 
     void CreateWFA() override;
     void ScanState(Quadrant &quadrant, char quadrant_symbol, int &parent_state_index) override;
@@ -27,7 +25,7 @@ private:
 
 public:
     NondeterministicCoding() = default;
-    NondeterministicCoding(const char *opened_filename, const char *saved_filename, int details, double epsilon);
+    NondeterministicCoding(const char *opened_filename, const char *saved_filename, int coding_depth, double epsilon);
 };
 
 #endif //NONDETERMINISTICCODING_H

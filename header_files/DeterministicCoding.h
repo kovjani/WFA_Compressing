@@ -17,7 +17,7 @@ protected:
 
 public:
     DeterministicCoding() = default;
-    DeterministicCoding(const char *opened_filename, const char *saved_filename, int details, double epsilon);
+    DeterministicCoding(const char *opened_filename, const char *saved_filename, double epsilon);
     ~DeterministicCoding() override;
 };
 

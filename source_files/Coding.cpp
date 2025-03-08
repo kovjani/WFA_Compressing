@@ -1,11 +1,9 @@
 #include "../header_files/Coding.h"
 
-Coding::Coding(const char *opened_filename, const char *saved_filename, int coding_depth, double epsilon) {
+Coding::Coding(const char *opened_filename, const char *saved_filename, double epsilon) {
     this->directory = g_path_get_dirname(opened_filename);
     this->saved_filename = saved_filename;
     this->EPS = epsilon;
-    this->coding_depth = coding_depth;
-    this->details = static_cast<int>(std::pow(4, coding_depth));
 
     //Open the image and split it into pieces.
 

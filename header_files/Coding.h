@@ -30,8 +30,6 @@ protected:
     int quadtree_size{0};
     double EPS{0.0001};
     int rounded{4};
-    int coding_depth{1};
-    int details{4}; //4^coding_depth
     int states_counter{1};
 
     double roundToOneDecimal(double x);
@@ -46,7 +44,7 @@ protected:
 
 public:
     Coding() = default;
-    Coding(const char *opened_filename, const char *saved_filename, int coding_depth, double epsilon);
+    Coding(const char *opened_filename, const char *saved_filename, double epsilon);
     virtual ~Coding();
     void Start();
 };

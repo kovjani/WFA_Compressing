@@ -2,13 +2,26 @@
 
 #include <iomanip>
 
-NondeterministicCoding::NondeterministicCoding(const char *opened_filename, const char *saved_filename, int details, double epsilon)
-    : Coding(opened_filename, saved_filename, details, epsilon){
-    A.setZero();
-    B.setZero();
-    C.setZero();
-    D.setZero();
-    M.setZero();
+NondeterministicCoding::NondeterministicCoding(const char *opened_filename, const char *saved_filename, int coding_depth, double epsilon)
+    : Coding(opened_filename, saved_filename, epsilon){
+
+    this->coding_depth = coding_depth;
+    this->details = static_cast<int>(std::pow(4, this->coding_depth)); //4^coding_depth
+
+    // this->states_counter = 1;
+    this->M = MatrixXd(this->details, this->states_counter);
+
+    this->A = MatrixXd(this->states_counter, this->states_counter);
+    this->B = MatrixXd(this->states_counter, this->states_counter);
+    this->C = MatrixXd(this->states_counter, this->states_counter);
+    this->D = MatrixXd(this->states_counter, this->states_counter);
+
+    this->M.setZero();
+
+    this->A.setZero();
+    this->B.setZero();
+    this->C.setZero();
+    this->D.setZero();
 }
 
 void NondeterministicCoding::CreateWFA() {
@@ -91,6 +104,7 @@ void NondeterministicCoding::ScanState(Quadrant &quadrant, char quadrant_symbol,
 
 
         M.conservativeResize(this->details, this->states_counter);
+
         Quadrant *state_quadrants = new Quadrant[this->details];
         index = 0;
         GetQuadrants(this->coding_depth, index, quadrant, state_quadrants);

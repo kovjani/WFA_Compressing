@@ -102,7 +102,7 @@ void onDeterministicCodingClicked(GtkWidget *clicked_button, GtkWidget *file_cho
     char *basename = g_path_get_basename(filename);
     char *basename_without_extension = RemoveExtension(basename);
 
-    DeterministicCoding code(filename,basename_without_extension, 4, 0.0001);
+    DeterministicCoding code(filename,basename_without_extension, 0.0001);
     strcat(basename_without_extension, ".dwfa");
 
     running = true;

@@ -1,7 +1,7 @@
 #include "../header_files/DeterministicCoding.h"
 
-DeterministicCoding::DeterministicCoding(const char *opened_filename, const char *saved_filename, int details, double epsilon)
-    : Coding(opened_filename, saved_filename, details, epsilon) {
+DeterministicCoding::DeterministicCoding(const char *opened_filename, const char *saved_filename, double epsilon)
+    : Coding(opened_filename, saved_filename, epsilon) {
 
     this->A = new Transition [this->quadtree_size];
     this->B = new Transition [this->quadtree_size];
