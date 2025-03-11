@@ -1,9 +1,8 @@
 #include "../header_files/Coding.h"
 
-Coding::Coding(const char *opened_filename, const char *saved_filename, double epsilon) {
+Coding::Coding(const char *opened_filename, const char *saved_filename) {
     this->directory = g_path_get_dirname(opened_filename);
     this->saved_filename = saved_filename;
-    this->EPS = epsilon;
 
     //Open the image and split it into pieces.
 
@@ -59,16 +58,12 @@ void Coding::Start() {
 
 }
 
-double Coding::roundToOneDecimal(double x) {
-    return std::round(x * 10.0) / 10.0;
-}
-
-void Coding::GetQuadrants(int level, int &index, const Quadrant &q, Quadrant *quadrants) const {
-    if(level > 0) {
-        GetQuadrants(level-1, index, *q.a, quadrants);
-        GetQuadrants(level-1, index, *q.b, quadrants);
-        GetQuadrants(level-1, index, *q.c, quadrants);
-        GetQuadrants(level-1, index, *q.d, quadrants);
+void Coding::GetQuadrants(int depth, int &index, const Quadrant &q, Quadrant *quadrants) const {
+    if(depth > 0) {
+        GetQuadrants(depth-1, index, *q.a, quadrants);
+        GetQuadrants(depth-1, index, *q.b, quadrants);
+        GetQuadrants(depth-1, index, *q.c, quadrants);
+        GetQuadrants(depth-1, index, *q.d, quadrants);
     } else {
         quadrants[index++] = q;
     }
@@ -131,7 +126,7 @@ double Coding::CreateQuadtree(int level, int index, int x, int y){
 
     double brightness = (static_cast<double>(r + g + b) / 3) / 255;
 
-    this->quadtree[index] = Quadrant(level, index, fabs(brightness) < 0.0001 ? 0.0001 : brightness);
+    this->quadtree[index] = Quadrant(level, index, brightness);
 
     // Leafs children reference to parents (leafs).
     this->quadtree[index].a = &this->quadtree[index];
@@ -139,5 +134,5 @@ double Coding::CreateQuadtree(int level, int index, int x, int y){
     this->quadtree[index].c = &this->quadtree[index];
     this->quadtree[index].d = &this->quadtree[index];
 
-    return fabs(brightness) < 0.0001 ? 0.0001 : brightness;
+    return brightness;
 }

@@ -1,9 +1,9 @@
 #include "../header_files/NondeterministicCoding.h"
 
-#include <iomanip>
+NondeterministicCoding::NondeterministicCoding(const char *opened_filename, const char *saved_filename, int coding_depth)
+    : Coding(opened_filename, saved_filename){
 
-NondeterministicCoding::NondeterministicCoding(const char *opened_filename, const char *saved_filename, int coding_depth, double epsilon)
-    : Coding(opened_filename, saved_filename, epsilon){
+    this->EPS = 0.000001;
 
     this->coding_depth = coding_depth;
     this->details = static_cast<int>(std::pow(4, this->coding_depth)); //4^coding_depth
@@ -50,6 +50,8 @@ void NondeterministicCoding::CreateWFA() {
         ScanState(c, 'c', i);
         ScanState(d, 'd', i);
 
+        g_print("%d:%d\n", i, this->states_counter);
+
     }
 }
 
@@ -80,30 +82,28 @@ void NondeterministicCoding::ScanState(Quadrant &quadrant, char quadrant_symbol,
         // If not, create new state representing scaned quadrant.
         this->states_counter++;
 
-        g_print("%d:%d\n", parent_state_index, this->states_counter);
+        this->A.conservativeResize(this->states_counter, this->states_counter);
+        this->A.rightCols(1).setZero();
+        this->A.bottomRows(1).setZero();
 
-        A.conservativeResize(this->states_counter, this->states_counter);
-        A.rightCols(1).setZero();
-        A.bottomRows(1).setZero();
+        this->B.conservativeResize(this->states_counter, this->states_counter);
+        this->B.rightCols(1).setZero();
+        this->B.bottomRows(1).setZero();
 
-        B.conservativeResize(this->states_counter, this->states_counter);
-        B.rightCols(1).setZero();
-        B.bottomRows(1).setZero();
+        this->C.conservativeResize(this->states_counter, this->states_counter);
+        this->C.rightCols(1).setZero();
+        this->C.bottomRows(1).setZero();
 
-        C.conservativeResize(this->states_counter, this->states_counter);
-        C.rightCols(1).setZero();
-        C.bottomRows(1).setZero();
-
-        D.conservativeResize(this->states_counter, this->states_counter);
-        D.rightCols(1).setZero();
-        D.bottomRows(1).setZero();
+        this->D.conservativeResize(this->states_counter, this->states_counter);
+        this->D.rightCols(1).setZero();
+        this->D.bottomRows(1).setZero();
 
 
         quadrant.state_index = this->states_counter - 1;
         this->states[this->states_counter - 1] = quadrant;
 
 
-        M.conservativeResize(this->details, this->states_counter);
+        this->M.conservativeResize(this->details, this->states_counter);
 
         Quadrant *state_quadrants = new Quadrant[this->details];
         index = 0;

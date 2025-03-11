@@ -2,15 +2,8 @@
 
 #include "../header_files/Transition.h"
 
-DeterministicDecoding::DeterministicDecoding(char *filename, char *saved_filename, int depth, int initial_state) {
-    this->depth = depth;
-    this->decoding_image_size = 1 << depth; // The size of the image (2^res)
-
-    this->directory = g_path_get_dirname(filename);
-    this->saved_filename = saved_filename;
-
-    this->pixels_colors = (double *)malloc(this->decoding_image_size*this->decoding_image_size*sizeof(double));
-
+DeterministicDecoding::DeterministicDecoding(char *filename, char *saved_filename, int depth, int initial_state)
+    : Decoding(filename, saved_filename, depth) {
     // Open a file in read mode
 
     string line, token;
@@ -154,9 +147,6 @@ DeterministicDecoding::~DeterministicDecoding() {
 
     delete[] this->F;
     this->F = nullptr;
-
-    delete this->pixels_colors;
-    this->pixels_colors = nullptr;
 }
 
 void DeterministicDecoding::Start() {
@@ -212,52 +202,4 @@ void DeterministicDecoding::DecodePixelsColors(int level, int x, int y, const Tr
     }
 
     this->pixels_colors[x * this->decoding_image_size + y] = average_color;
-}
-
-void DeterministicDecoding::OpenImage(char *full_path) const{
-    
-    GtkWidget *window;
-    GtkWidget *image;
-    GtkWidget *vbox;
-
-    //gtk_init(&argc, &argv);
-
-    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "Dekódolt kép");
-
-    vbox = gtk_vbox_new(FALSE, 5);
-    gtk_container_add(GTK_CONTAINER(window), vbox);
-
-    image = gtk_image_new();
-    gtk_box_pack_start(GTK_BOX(vbox), image, TRUE, TRUE, 0);
-
-    gtk_image_set_from_file(GTK_IMAGE(image), full_path);
-
-    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-
-    gtk_widget_show_all(window);
-
-    gtk_main();
-}
-
-char *DeterministicDecoding::SaveDecodedImage(char *directory, char *filename) const {
-
-    GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, this->decoding_image_size, this->decoding_image_size);
-    guchar *pixels = gdk_pixbuf_get_pixels(pixbuf);
-    int rowstride = gdk_pixbuf_get_rowstride(pixbuf);
-    int n_channels = gdk_pixbuf_get_n_channels(pixbuf);
-
-    for (int x = 0; x < this->decoding_image_size; ++x) {
-        for (int y = 0; y < this->decoding_image_size; ++y) {
-            guchar *p = pixels + x * rowstride + y * n_channels;
-            p[0] = p[1] = p[2] = this->pixels_colors[x * this->decoding_image_size + y]; // Set R, G, B to the grayscale value
-        }
-    }
-    char *filename_with_path = g_build_filename(directory, filename, NULL);
-
-    gdk_pixbuf_save(pixbuf, filename_with_path, "png", NULL, NULL);
-
-    g_object_unref(pixbuf);
-
-    return filename_with_path;
 }

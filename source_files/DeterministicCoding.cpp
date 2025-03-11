@@ -1,7 +1,9 @@
 #include "../header_files/DeterministicCoding.h"
 
-DeterministicCoding::DeterministicCoding(const char *opened_filename, const char *saved_filename, double epsilon)
-    : Coding(opened_filename, saved_filename, epsilon) {
+DeterministicCoding::DeterministicCoding(const char *opened_filename, const char *saved_filename)
+    : Coding(opened_filename, saved_filename) {
+
+    this->EPS = 0.0001;
 
     this->A = new Transition [this->quadtree_size];
     this->B = new Transition [this->quadtree_size];
@@ -45,6 +47,8 @@ void DeterministicCoding::CreateWFA() {
         ScanState(b, 'b', i);
         ScanState(c, 'c', i);
         ScanState(d, 'd', i);
+
+        g_print("%d:%d\n", i, this->states_counter);
 
     }
 }

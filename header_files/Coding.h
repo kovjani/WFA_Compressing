@@ -4,7 +4,6 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <string>
 #include <cstring>
 #include <cmath>
 #include <algorithm>
@@ -32,19 +31,17 @@ protected:
     int rounded{4};
     int states_counter{1};
 
-    double roundToOneDecimal(double x);
-
     double CreateQuadtree(int level, int index, int x, int y);
     double CompareQuadrants(const Quadrant &q1, const Quadrant &q2) const;
-    void GetQuadrants(int level, int &index, const Quadrant &q, Quadrant *quadrants) const;
+    void GetQuadrants(int depth, int &index, const Quadrant &q, Quadrant *quadrants) const;
 
-    virtual void CreateWFA(){}
-    virtual void ScanState(Quadrant &quadrant, char quadrant_symbol, int &parent_state_index){}
-    virtual void SaveWFA(const char *filename){}
+    virtual void CreateWFA() = 0;
+    virtual void ScanState(Quadrant &quadrant, char quadrant_symbol, int &parent_state_index) = 0;
+    virtual void SaveWFA(const char *filename) = 0;
 
 public:
     Coding() = default;
-    Coding(const char *opened_filename, const char *saved_filename, double epsilon);
+    Coding(const char *opened_filename, const char *saved_filename);
     virtual ~Coding();
     void Start();
 };

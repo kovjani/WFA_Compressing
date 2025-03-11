@@ -1,7 +1,6 @@
 #include <iostream>
 #include <thread>
 #include <atomic>
-#include <string>
 #include <cstring>
 #include <gtk/gtk.h>
 #include <glib.h>
@@ -22,16 +21,6 @@ static GtkWidget *nondeterministic_decoding_page_button = nullptr;
 static GtkSpinButton *spin_depth_dd = nullptr, *spin_state_dd = nullptr, *spin_depth_nc = nullptr;
 static GtkSpinButton *spin_depth_nd = nullptr, *spin_state_nd = nullptr;
 static GtkComboBoxText *combo_resolution_nd = nullptr, *combo_resolution_dd = nullptr, *combo_detail_nc = nullptr;
-
-char* RemoveExtension(char* filename) {
-    char* last_dot = strrchr(filename, '.');
-    if (last_dot == nullptr) {
-        // No extension found
-        return filename;
-    }
-    *last_dot = '\0';
-    return filename;
-}
 
 void SetWindowSensitivity(GtkWidget &clicked_button, GtkWidget &file_chooser_button, bool value) {
     if(value) {
@@ -90,8 +79,18 @@ void gtk_main_loop() {
     while (running) {
         while (gtk_events_pending())
             gtk_main_iteration();
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
     }
+}
+
+char* RemoveExtension(char* filename) {
+    char* last_dot = strrchr(filename, '.');
+    if (last_dot == nullptr) {
+        // No extension found
+        return filename;
+    }
+    *last_dot = '\0';
+    return filename;
 }
 
 void onDeterministicCodingClicked(GtkWidget *clicked_button, GtkWidget *file_chooser_button) {
@@ -102,7 +101,7 @@ void onDeterministicCodingClicked(GtkWidget *clicked_button, GtkWidget *file_cho
     char *basename = g_path_get_basename(filename);
     char *basename_without_extension = RemoveExtension(basename);
 
-    DeterministicCoding code(filename,basename_without_extension, 0.0001);
+    DeterministicCoding code(filename,basename_without_extension);
     strcat(basename_without_extension, ".dwfa");
 
     running = true;
@@ -157,6 +156,7 @@ void onDeterministicDecodingClicked(GtkWidget *clicked_button, GtkWidget *file_c
     t.join();
 
     g_free(filename);
+    g_free(resolution);
 
     SetWindowSensitivity(*clicked_button, *file_chooser_button, TRUE);
 }
@@ -186,7 +186,7 @@ void onNondeterministicCodingClicked(GtkWidget *clicked_button, GtkWidget *file_
         coding_depth = 6;
     }
 
-    NondeterministicCoding code(filename, basename_without_extension, coding_depth, 0.000001);
+    NondeterministicCoding code(filename, basename_without_extension, coding_depth);
     strcat(basename_without_extension, ".ndwfa");
 
     running = true;
@@ -202,6 +202,7 @@ void onNondeterministicCodingClicked(GtkWidget *clicked_button, GtkWidget *file_
 
     g_free(filename);
     g_free(basename);
+    g_free(gtk_details);
 
     SetWindowSensitivity(*clicked_button, *file_chooser_button, TRUE);
 }
@@ -211,7 +212,6 @@ void onNondeterministicDecodingClicked(GtkWidget *clicked_button, GtkWidget *fil
     SetWindowSensitivity(*clicked_button, *file_chooser_button, FALSE);
 
     char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_chooser_button));
-    char *directory = g_path_get_dirname(filename);
 
     int decoding_depth = 9;
     char* resolution = gtk_combo_box_text_get_active_text(combo_resolution_nd);
@@ -242,7 +242,7 @@ void onNondeterministicDecodingClicked(GtkWidget *clicked_button, GtkWidget *fil
     t.join();
 
     g_free(filename);
-    g_free(directory);
+    g_free(resolution);
 
     SetWindowSensitivity(*clicked_button, *file_chooser_button, TRUE);
 }

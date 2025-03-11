@@ -14,7 +14,3 @@ Transition::Transition(int i, int j, double value) {
     this->j = j;
     this->value = value;
 }
-
-/*bool Transition::operator< (const Transition &other) const {
-    return this->i < other.i;
-}*/

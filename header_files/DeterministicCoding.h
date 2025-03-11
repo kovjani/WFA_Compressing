@@ -10,14 +10,13 @@ class DeterministicCoding : public Coding {
 private:
     Transition *A{}, *B{}, *C{}, *D{};
 
-protected:
     void CreateWFA() override;
     void ScanState(Quadrant &quadrant, char quadrant_symbol, int &parent_state_index) override;
     void SaveWFA(const char *filename) override;
 
 public:
     DeterministicCoding() = default;
-    DeterministicCoding(const char *opened_filename, const char *saved_filename, double epsilon);
+    DeterministicCoding(const char *opened_filename, const char *saved_filename);
     ~DeterministicCoding() override;
 };
 
