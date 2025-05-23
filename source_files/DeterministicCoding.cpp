@@ -4,6 +4,7 @@ DeterministicCoding::DeterministicCoding(const char *opened_filename, const char
     : Coding(opened_filename, saved_filename) {
 
     this->EPS = 0.0001;
+    this->rounded = 4;
 
     this->A = new Transition [this->quadtree_size];
     this->B = new Transition [this->quadtree_size];
@@ -124,7 +125,7 @@ void DeterministicCoding::SaveWFA(const char *filename) {
 
     // F
     for (int i = 0; i < this->states_counter; ++i) {
-        // Round value to 4 decimals
+        // Round value to number of decimals given in this->rounded.
         ostringstream oss;
         oss << fixed << setprecision(this->rounded) << this->states[i].brightness;
         std::string brightness = oss.str();
@@ -155,7 +156,7 @@ void DeterministicCoding::SaveWFA(const char *filename) {
             continue;
         }
 
-        // Round value to 4 decimals
+        // Round value to number of decimals given in this->rounded.
         ostringstream oss;
         oss << fixed << setprecision(this->rounded) << this->A[i].value;
         std::string brightness = oss.str();
@@ -186,7 +187,7 @@ void DeterministicCoding::SaveWFA(const char *filename) {
             continue;
         }
 
-        // Round value to 4 decimals
+        // Round value to number of decimals given in this->rounded.
         ostringstream oss;
         oss << fixed << setprecision(this->rounded) << this->B[i].value;
         std::string brightness = oss.str();
@@ -217,7 +218,7 @@ void DeterministicCoding::SaveWFA(const char *filename) {
             continue;
         }
 
-        // Round value to 4 decimals
+        // Round value to number of decimals given in this->rounded.
         ostringstream oss;
         oss << fixed << setprecision(this->rounded) << this->C[i].value;
         std::string brightness = oss.str();
@@ -248,7 +249,7 @@ void DeterministicCoding::SaveWFA(const char *filename) {
             continue;
         }
 
-        // Round value to 4 decimals
+        // Round value to number of decimals given in this->rounded.
         ostringstream oss;
         oss << fixed << setprecision(this->rounded) << this->D[i].value;
         std::string brightness = oss.str();

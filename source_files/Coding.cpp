@@ -21,6 +21,7 @@ Coding::Coding(const char *opened_filename, const char *saved_filename) {
     // The number of leaves in a full quadtree is (4^level).
     // We don't want to store the leaves.
     this->depth = static_cast <int> (log2(this->coding_image_size)); // maximum recursion level
+    g_print("%d ", this->depth);
     this->quadtree_size = 0;
 
     // In this iteration the maximum value of i is depth-1
@@ -36,6 +37,8 @@ Coding::Coding(const char *opened_filename, const char *saved_filename) {
 Coding::~Coding() {
     // Free the allocated memory.
     g_object_unref(this->pixbuf);
+
+    g_free(this->directory);
 
     delete[] this->quadtree;
     this->quadtree = nullptr;
@@ -124,7 +127,7 @@ double Coding::CreateQuadtree(int level, int index, int x, int y){
     const int g = p[1];
     const int b = p[2];
 
-    double brightness = (static_cast<double>(r + g + b) / 3) / 255;
+    double brightness = (static_cast<double>(r + g + b) / 3) / 256;
 
     this->quadtree[index] = Quadrant(level, index, brightness);
 

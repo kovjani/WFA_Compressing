@@ -20,7 +20,8 @@ protected:
 
     Quadrant *quadtree{}, *states{};
 
-    const char *directory{}, *saved_filename{};
+    char *directory{};
+    const char *saved_filename{};
 
     int width{0};
     int height{0};

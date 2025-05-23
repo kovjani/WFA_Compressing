@@ -14,15 +14,15 @@ NondeterministicDecoding::NondeterministicDecoding(char *filename, char *saved_f
     getline(wfa_file, line);     // \n
 
     // Allocate memory
-    this->I.resize(this->n);
-    this->F.resize(this->n);
+    this->I = RowVectorXd(this->n);
+    this->F = VectorXd(this->n);
 
-    this->Inn.resize(this->n, this->n);
+    this->Inn = MatrixXd(this->n, this->n);
 
-    this->A.resize(this->n, this->n);
-    this->B.resize(this->n, this->n);
-    this->C.resize(this->n, this->n);
-    this->D.resize(this->n, this->n);
+    this->A = MatrixXd(this->n, this->n);
+    this->B = MatrixXd(this->n, this->n);
+    this->C = MatrixXd(this->n, this->n);
+    this->D = MatrixXd(this->n, this->n);
 
     // Initialize I
     this->I.setIdentity();
@@ -46,7 +46,7 @@ NondeterministicDecoding::NondeterministicDecoding(char *filename, char *saved_f
 
         for (int i = 0; i < this->n; ++i) {
             getline(line_stream, token, ' '); // Split line by space and get the next token
-            this->F(i) = stod(token) * 255;
+            this->F(i) = stod(token) * 256;
         }
     }
 
@@ -117,10 +117,11 @@ void NondeterministicDecoding::Start() {
 }
 
 void NondeterministicDecoding::DecodePixelsColors(int level, int x, int y, const RowVectorXd &previous_result, const MatrixXd &next_matrix) {
-    if(level > 0 ) {
-        // Matrix multiplication
-        RowVectorXd result = previous_result * next_matrix;
 
+    // Matrix multiplication
+    RowVectorXd result = previous_result * next_matrix;
+
+    if(level > 0 ) {
         int quadrant_size = 1 << level; // 2^level
 
         // Call recursively for all quadrants
@@ -129,11 +130,10 @@ void NondeterministicDecoding::DecodePixelsColors(int level, int x, int y, const
         DecodePixelsColors(level-1, x, y + quadrant_size/2, result, this->C);
         DecodePixelsColors(level-1, x + quadrant_size/2, y + quadrant_size/2,result, this->D);
 
-        return;
-    }
-    // else
-    // Pixels
-    double average_color = previous_result.dot(this->F);
+    } else {
+        // a pixel
+        double average_color = result.dot(this->F);
 
-    this->pixels_colors[x * this->decoding_image_size + y] = average_color;
+        this->image_pixels[x * this->decoding_image_size + y] = static_cast<uint8_t>(average_color);
+    }
 }

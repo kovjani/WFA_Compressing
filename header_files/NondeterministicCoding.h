@@ -2,8 +2,6 @@
 #define NONDETERMINISTICCODING_H
 
 #include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/Sparse>
-#include <eigen3/Eigen/IterativeLinearSolvers>
 
 #include "Coding.h"
 

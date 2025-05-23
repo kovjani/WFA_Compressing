@@ -4,6 +4,7 @@ NondeterministicCoding::NondeterministicCoding(const char *opened_filename, cons
     : Coding(opened_filename, saved_filename){
 
     this->EPS = 0.000001;
+    this->rounded = 6;
 
     this->coding_depth = coding_depth;
     this->details = static_cast<int>(std::pow(4, this->coding_depth)); //4^coding_depth
@@ -147,7 +148,7 @@ void NondeterministicCoding::SaveWFA(const char *filename) {
     // F
     for (int i = 0; i < this->states_counter; ++i) {
 
-        // Round value to 4 decimals
+        // Round value to number of decimals given in this->rounded.
         ostringstream oss;
         oss << fixed << setprecision(this->rounded) << this->states[i].brightness;
         //oss << fixed << setprecision(4) << this->quadtree[i]->brightness;
@@ -170,7 +171,7 @@ void NondeterministicCoding::SaveWFA(const char *filename) {
     for (int i = 0; i < this->states_counter; ++i) {
         for (int j = 0; j < this->states_counter; ++j) {
 
-            // Round value to 4 decimals
+            // Round value to number of decimals given in this->rounded.
             ostringstream oss;
             oss << fixed << setprecision(this->rounded) << this->A(i, j);
             std::string str = oss.str();
@@ -195,7 +196,7 @@ void NondeterministicCoding::SaveWFA(const char *filename) {
     for (int i = 0; i < this->states_counter; ++i) {
         for (int j = 0; j < this->states_counter; ++j) {
 
-            // Round value to 4 decimals
+            // Round value to number of decimals given in this->rounded.
             ostringstream oss;
             oss << fixed << setprecision(this->rounded) << this->B(i, j);
             std::string str = oss.str();
@@ -220,7 +221,7 @@ void NondeterministicCoding::SaveWFA(const char *filename) {
     for (int i = 0; i < this->states_counter; ++i) {
         for (int j = 0; j < this->states_counter; ++j) {
 
-            // Round value to 4 decimals
+            // Round value to number of decimals given in this->rounded.
             ostringstream oss;
             oss << fixed << setprecision(this->rounded) << this->C(i, j);
             std::string str = oss.str();
@@ -245,7 +246,7 @@ void NondeterministicCoding::SaveWFA(const char *filename) {
     for (int i = 0; i < this->states_counter; ++i) {
         for (int j = 0; j < this->states_counter; ++j) {
 
-            // Round value to 4 decimals
+            // Round value to number of decimals given in this->rounded.
             ostringstream oss;
             oss << fixed << setprecision(this->rounded) << this->D(i, j);
             std::string str = oss.str();

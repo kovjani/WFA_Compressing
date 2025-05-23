@@ -42,7 +42,7 @@ DeterministicDecoding::DeterministicDecoding(char *filename, char *saved_filenam
 
         for (int i = 0; i < this->n; ++i) {
             getline(line_stream, token, ' '); // Split line by space and get the next token
-            this->F[i] = Transition(0, stod(token) * 255);
+            this->F[i] = Transition(0, stod(token) * 256);
         }
     }
 
@@ -159,26 +159,26 @@ void DeterministicDecoding::Start() {
 }
 
 void DeterministicDecoding::DecodePixelsColors(int level, int x, int y, const Transition &previous_matrix, Transition *next_matrix) {
+    double value = 0;
+    int res_j = 0;
+
+    // Matrix multiplication
+    // Previous_matrix always has one element, because the automata is deterministic.
+    const Transition pre = previous_matrix;
+    for (int i = 0; i < this->n; ++i) {
+        Transition next = next_matrix[i];
+        // i = next->i
+        if(pre.j == i) {
+            value = pre.value * next.value;
+            // pre->i is always 0, because the previous matrix is a row vector
+            res_j = next.j;
+            break;
+        }
+    }
+
+    const Transition result = Transition(res_j, value);
 
     if(level > 0 ) {
-        double value = 0;
-        int res_j = 0;
-
-        // Matrix multiplication
-        // Previous_matrix always has one element, because the automata is deterministic.
-        const Transition pre = previous_matrix;
-        for (int i = 0; i < this->n; ++i) {
-            Transition next = next_matrix[i];
-            // i = next->i
-            if(pre.j == i) {
-                value = pre.value * next.value;
-                // pre->i is always 0, because the previous matrix is a row vector
-                res_j = next.j;
-                break;
-            }
-        }
-
-        const Transition result = Transition(res_j, value);
         int quadrant_size = 1 << level; // 2^level
 
         DecodePixelsColors(level-1, x, y, result, this->A);
@@ -186,20 +186,18 @@ void DeterministicDecoding::DecodePixelsColors(int level, int x, int y, const Tr
         DecodePixelsColors(level-1, x, y + quadrant_size/2, result, this->C);
         DecodePixelsColors(level-1, x + quadrant_size/2, y + quadrant_size/2,result, this->D);
 
-        return;
-    }
-    // else
-    // Pixels
-    double average_color = 0;
-    const Transition pre = previous_matrix;
+    } else {
+        // a pixel
+        double average_color = 0;
 
-    for (int i = 0; i < this->n; ++i) {
-        // i = this->F[i]->i
-        if(pre.j == i) {
-            average_color = pre.value * this->F[i].value;
-            break;
+        for (int i = 0; i < this->n; ++i) {
+            // i = this->F[i]->i
+            if(result.j == i) {
+                average_color = result.value * this->F[i].value;
+                break;
+            }
         }
-    }
 
-    this->pixels_colors[x * this->decoding_image_size + y] = average_color;
+        this->image_pixels[x * this->decoding_image_size + y] = static_cast<uint8_t>(average_color);
+    }
 }

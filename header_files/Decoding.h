@@ -13,7 +13,7 @@ protected:
 
     int depth{}; // Decoding depth, maximum depth of recursion
     int decoding_image_size{}; // The size of the image (2^depth)
-    double *pixels_colors{};
+    uint8_t *image_pixels{};
 
     char *SaveDecodedImage(char *directory, char *filename) const;
     static void OpenImage(char *full_path) ;
